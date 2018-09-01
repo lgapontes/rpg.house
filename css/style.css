@@ -1,0 +1,35 @@
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+div.header {
+    margin: 0;
+    padding: 0;
+    line-height: 60px;
+    background-color: #602a2c;
+    color: #ffffff;
+    font-size: 1.5em;
+
+    box-shadow: 0 3px 3px #999999;
+
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+div.header img {
+    box-sizing: border-box;
+    border: 0;
+    margin: 6px;
+    width: 48px;
+    float: left;
+}
+
+div.header span {
+    box-sizing: border-box;
+    margin-left: 4px;
+    float: left;
+}
