@@ -1,14 +1,16 @@
 /* Consts */
+const DEBUG = true;
+
 const CANVAS_BORDER = 4;
 
 const TILE_WIDTH = 71;
 const TILE_HEIGHT = 53;
 
-const INPUT_GATEWAY_WIDTH = 71;
-const INPUT_GATEWAY_HEIGHT = 65;
+const GATEWAY_WIDTH = 95;
+const GATEWAY_HEIGHT = 95;
 
 const DEFAULT_PERCENT = 1;
-const DEFAULT_FONT_FAMILY = 'bold 20px monospace';
+const DEFAULT_FONT_FAMILY = 'bold 16px monospace';
 const DEFAULT_FONT_COLOR = '#523e07';
 
 const LINKS = {
@@ -19,96 +21,188 @@ const LINKS = {
 
 const ROOM_SIZE = {
     /*** TINY ***/
-    tiny: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false }
-    ],
+    tiny: {
+        s2x2: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ]
+    },
 
-    /*** SMALL_3x2 ***/
-    small_3x2: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true },
-        { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false },
-        { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false }
-    ],
+    /*** SMALL ***/
+    small: {
+        s3x2: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s2x3: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '6', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s3x3: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '7', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '8', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '9', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ]
+    },
 
-    /*** SMALL_2x3 ***/
-    small_2x3: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false },
-        { index: '5', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false },
-        { index: '6', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false }
-    ],
+    /*** MEDIUM ***/
+    medium: {
+        s4x2: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '6', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '7', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '8', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s4x3: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '6', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '7', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '8', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '9', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '10', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '11', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '12', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s4x4: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '6', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '7', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '8', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '9', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '10', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '11', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '12', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '13', origin: { baseIndex: 8, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '14', origin: { baseIndex: 9, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '15', origin: { baseIndex: 10, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '16', origin: { baseIndex: 11, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s2x4: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '6', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '7', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '8', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s3x4: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '7', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '8', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '9', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '10', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '11', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '12', origin: { baseIndex: 8, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ]
+    },
 
-    /*** SMALL_3x3 ***/
-    small_3x3: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true },
-        { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false },
-        { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false },
-        { index: '7', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false },
-        { index: '8', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false },
-        { index: '9', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false }
-    ],
-
-    /*** MEDIUM_4x2 ***/
-    medium_4x2: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true },
-        { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true },
-        { index: '5', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '6', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false },
-        { index: '7', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false },
-        { index: '8', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false }
-    ],
-
-    /*** MEDIUM_4x3 ***/
-    medium_4x3: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true },
-        { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true },
-        { index: '5', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '6', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false },
-        { index: '7', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false },
-        { index: '8', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false },
-        { index: '9', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false },
-        { index: '10', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false },
-        { index: '11', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false },
-        { index: '12', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false }
-    ],
-
-    /*** MEDIUM_4x4 ***/
-    medium_4x4: [
-        { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true },
-        { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true },
-        { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true },
-        { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true },
-        { index: '5', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false },
-        { index: '6', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false },
-        { index: '7', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false },
-        { index: '8', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false },
-        { index: '9', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false },
-        { index: '10', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false },
-        { index: '11', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false },
-        { index: '12', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false },
-        { index: '13', origin: { baseIndex: 8, link: LINKS.bottom }, acceptGateway: false },
-        { index: '14', origin: { baseIndex: 9, link: LINKS.bottom }, acceptGateway: false },
-        { index: '15', origin: { baseIndex: 10, link: LINKS.bottom }, acceptGateway: false },
-        { index: '16', origin: { baseIndex: 11, link: LINKS.bottom }, acceptGateway: false }
-    ],
+    /*** BIG ***/
+    big: {
+        s5x3: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '6', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '7', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '8', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '9', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '10', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '11', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '12', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '13', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '14', origin: { baseIndex: 8, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '15', origin: { baseIndex: 9, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s5x4: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '6', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '7', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '8', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '9', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '10', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '11', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '12', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '13', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '14', origin: { baseIndex: 8, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '15', origin: { baseIndex: 9, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '16', origin: { baseIndex: 10, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '17', origin: { baseIndex: 11, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '18', origin: { baseIndex: 12, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '19', origin: { baseIndex: 13, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '20', origin: { baseIndex: 14, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ],
+        s5x5: [
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false },
+            { index: '6', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '7', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '8', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '9', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '10', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '11', origin: { baseIndex: 5, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '12', origin: { baseIndex: 6, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '13', origin: { baseIndex: 7, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '14', origin: { baseIndex: 8, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '15', origin: { baseIndex: 9, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '16', origin: { baseIndex: 10, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '17', origin: { baseIndex: 11, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '18', origin: { baseIndex: 12, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '19', origin: { baseIndex: 13, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false },
+            { index: '20', origin: { baseIndex: 14, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false },
+            { index: '21', origin: { baseIndex: 15, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '22', origin: { baseIndex: 16, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '23', origin: { baseIndex: 17, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '24', origin: { baseIndex: 18, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true },
+            { index: '25', origin: { baseIndex: 19, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true }
+        ]
+    }
 };
 
-let SHOW_INDEXES = true;
+let SHOW_INDEXES = DEBUG;
 
 /* Model */
 function Mouse() {
@@ -182,14 +276,28 @@ function Tile(context,scaffold) {
     this.origin = scaffold.origin;
     this.memory = { x:0, y:0 };
     this.inputGateway = undefined;
+    this.exitGateway = undefined;
+    this.acceptDoor = scaffold.acceptDoor;
+    this.acceptExit = scaffold.acceptExit;
 }
 
 Tile.prototype.setInputGateway = function() {
     this.inputGateway = new Image(
         this.context,
-        'input-gateway',
-        INPUT_GATEWAY_WIDTH,
-        INPUT_GATEWAY_HEIGHT,
+        'gateway',
+        GATEWAY_WIDTH,
+        GATEWAY_HEIGHT,
+        DEFAULT_PERCENT
+    );
+}
+
+Tile.prototype.setExitGateway = function() {
+    console.log(this.index);
+    this.exitGateway = new Image(
+        this.context,
+        'gateway',
+        GATEWAY_WIDTH,
+        GATEWAY_HEIGHT,
         DEFAULT_PERCENT
     );
 }
@@ -202,34 +310,50 @@ Tile.prototype.render = function(x,y) {
     if (SHOW_INDEXES) {
         this.context.font=DEFAULT_FONT_FAMILY;
         this.context.fillStyle = DEFAULT_FONT_COLOR;
-        let diff = (this.index.length > 1) ? -6 : 0;
+        let label = this.index;
+        if (DEBUG && this.acceptDoor) label = 'D' + label;
+        if (DEBUG && this.acceptExit) label = label + 'E';
+        let diff = (label.length-1) * -5;
         this.context.fillText(
-            this.index,
-            x+29 + diff,
-            y+28
+            label,
+            x+31 + diff,
+            y+27
         );
     }
 
     if (this.inputGateway !== undefined) {
-        //this.inputGateway.render(x+36,y-46);
-        this.inputGateway.render(x+42,y-50);
+        this.inputGateway.render(x+6,y-70);
+    }
+    if (this.exitGateway !== undefined) {
+        this.exitGateway.render(x-29,y-51);
     }
 }
 
-function Room(context) {
-    this.context = context;
+function RandomRoom(randomSize) {
+    let indexesInputGateway = [];
+    let indexesExitGateway = [];
+    randomSize.forEach(function(scaffold,index){
+        if (scaffold.acceptGateway) { indexesInputGateway.push(index); }
+        if (scaffold.acceptExit) { indexesExitGateway.push(index); }
+    });
+
+    this.size = randomSize;
+    this.indexInputGateway = indexesInputGateway[random(indexesInputGateway.length)];
+    this.indexExitGateway = indexesExitGateway[random(indexesExitGateway.length)];
+}
+
+function Room(context,randomRoom) {
     let tiles = [];
-    let indexesGateway = [];
-    let size = ROOM_SIZE.medium_4x4;
+    let size = randomRoom.size;
     size.forEach(function(scaffold,index){
-        if (scaffold.acceptGateway) { indexesGateway.push(index); }
         let tile = new Tile(context,scaffold);
         tiles.push(tile);
     });
-    this.tiles = tiles;
 
-    let indexGateway = random(indexesGateway.length);
-    this.tiles[indexGateway].setInputGateway();
+    this.context = context;
+    this.tiles = tiles;
+    this.tiles[randomRoom.indexInputGateway].setInputGateway();
+    this.tiles[randomRoom.indexExitGateway].setExitGateway();
 }
 
 Room.prototype.render = function(x,y) {
@@ -245,7 +369,10 @@ Room.prototype.render = function(x,y) {
 function Map(canvas,context) {
     this.canvas = canvas;
     this.context = context;
-    this.room = new Room(context);
+
+    /************************* RANDOM *************************/
+    let randomRoom = new RandomRoom(ROOM_SIZE.big.s5x5);
+    this.room = new Room(context,randomRoom);
 }
 
 Map.prototype.background = function() {
@@ -281,6 +408,10 @@ let mouse = new Mouse();
 /* Functions */
 function random(maxExclusive) {
     return Math.floor(Math.random() * maxExclusive);
+}
+
+function randomBetween(minInclusive, maxExclusive) {
+    return Math.floor(Math.random() * (max - min) ) + min;
 }
 
 function setDungeonName() {
