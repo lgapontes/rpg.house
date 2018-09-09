@@ -566,15 +566,15 @@ Tile.prototype.render = function(x,y) {
     if (this.inputGateway !== undefined) {
         this.inputGateway.render(x+6,y-70);
     }
-    if (this.exitGateway !== undefined) {
-        this.exitGateway.render(x-29,y-51);
-    }
     if (this.door !== undefined) {
         this.door.render(x,y);
     }
+    if (this.exitGateway !== undefined) {
+        this.exitGateway.render(x-29,y-51);
+    }
 }
 
-function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway) {
+function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway,isAuxiliary) {
     let indexesInputGateway = [];
     let indexesExitGateway = [];
     let indexesBottomPassage = [];
@@ -649,21 +649,30 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
     /* Top Door */
     this.topDoor = { x: 0, y: 0, nullable: true };
     if (containsTopDoor && !inputDefined && (indexesTopDoor.length > 0)) {
-        let start = Math.floor(indexesTopDoor.length / 2) + 1;
-        if (indexesTopDoor.length >= 5) {
-            if (randomBoolean()) start = indexesTopDoor.length-2;
-            else start = indexesTopDoor.length-1;
-        }
-        if (start == indexesTopDoor.length) start = indexesTopDoor.length-1;
-
-        for (let i=start; i < indexesTopDoor.length; i++) {
-            let tile = this.tiles[ indexesTopDoor[i] ];
-            if (this.topDoor.nullable && (randomPercent(75) || (i == (indexesTopDoor.length-1)))) {
-                tile.createDoor(DOOR_TYPE.top);
-                let multiplier = indexesTopDoor[i];
-                this.topDoor.x = multiplier * LINKS.right.x;
-                this.topDoor.y = multiplier * LINKS.right.y;
-                this.topDoor.nullable = false;
+        if (isAuxiliary) {
+            let index = 0;
+            let tile = this.tiles[ indexesTopDoor[index] ];
+            tile.createDoor(DOOR_TYPE.top);
+            let multiplier = indexesTopDoor[index];
+            this.topDoor.x = multiplier * LINKS.right.x;
+            this.topDoor.y = multiplier * LINKS.right.y;
+            this.topDoor.nullable = false;
+        } else {
+            let start = Math.floor(indexesTopDoor.length / 2) + 1;
+            if (indexesTopDoor.length >= 5) {
+                if (randomBoolean()) start = indexesTopDoor.length-2;
+                else start = indexesTopDoor.length-1;
+            }
+            if (start == indexesTopDoor.length) start = indexesTopDoor.length-1;
+            for (let i=start; i < indexesTopDoor.length; i++) {
+                let tile = this.tiles[ indexesTopDoor[i] ];
+                if (this.topDoor.nullable && (randomPercent(75) || (i == (indexesTopDoor.length-1)))) {
+                    tile.createDoor(DOOR_TYPE.top);
+                    let multiplier = indexesTopDoor[i];
+                    this.topDoor.x = multiplier * LINKS.right.x;
+                    this.topDoor.y = multiplier * LINKS.right.y;
+                    this.topDoor.nullable = false;
+                }
             }
         }
     }
@@ -671,16 +680,26 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
     /* Left Door */
     this.leftDoor = { x: 0, y: 0, nullable: true };
     if (containsLeftDoor && indexesLeftDoor.length > 0) {
-        let start = Math.floor(indexesLeftDoor.length / 2) + 1;
-        if (start >= indexesLeftDoor.length) start--;
-        for (let i=start; i < indexesLeftDoor.length; i++) {
-            let tile = this.tiles[ indexesLeftDoor[i] ];
-            if (this.leftDoor.nullable && (randomPercent(75) || (i == (indexesLeftDoor.length-1)))) {
-                tile.createDoor(DOOR_TYPE.left);
-                let multiplier = i;
-                this.leftDoor.x = multiplier * LINKS.bottom.x;
-                this.leftDoor.y = multiplier * LINKS.bottom.y;
-                this.leftDoor.nullable = false;
+        if (isAuxiliary) {
+            let index = 0;
+            let tile = this.tiles[ indexesLeftDoor[index] ];
+            tile.createDoor(DOOR_TYPE.left);
+            let multiplier = index;
+            this.leftDoor.x = multiplier * LINKS.bottom.x;
+            this.leftDoor.y = multiplier * LINKS.bottom.y;
+            this.leftDoor.nullable = false;
+        } else {
+            let start = Math.floor(indexesLeftDoor.length / 2) + 1;
+            if (start >= indexesLeftDoor.length) start--;
+            for (let i=start; i < indexesLeftDoor.length; i++) {
+                let tile = this.tiles[ indexesLeftDoor[i] ];
+                if (this.leftDoor.nullable && (randomPercent(75) || (i == (indexesLeftDoor.length-1)))) {
+                    tile.createDoor(DOOR_TYPE.left);
+                    let multiplier = i;
+                    this.leftDoor.x = multiplier * LINKS.bottom.x;
+                    this.leftDoor.y = multiplier * LINKS.bottom.y;
+                    this.leftDoor.nullable = false;
+                }
             }
         }
     }
@@ -711,7 +730,7 @@ Room.prototype.render = function(x,y) {
 /**********************************************************************************************************/
 /************************************************** MAP ***************************************************/
 /**********************************************************************************************************/
-function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,numberOfExits) {
+function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,containsExit) {
     this.canvas = canvas;
     this.context = context;
 
@@ -722,22 +741,21 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,nu
 
     this.minorSize = minorSize;
     this.majorSize = majorSize;
-
-    let exitLimit = Math.floor(numberOfRooms / 2);
-    let countExits = 0;
+    this.flatAuxiliaryRoom = true;
 
     /* Create Main Room */
-    this.mainRoom = this.createRoom(false,false,true);
+    this.mainRoom = this.createRoom(false,false,true,false);
 
     let room = this.mainRoom;
     while (this.countLeftRooms < this.numberOfLeftRooms) {
         if (room.passageRight) {
-            if (containsHallway && randomPercent(40)) {
+            if (containsHallway && randomPercent(25)) {
                 room.next.left = this.createHallway(true);
                 room = room.next.left;
             }
 
-            room.next.left = this.createRoom(false,true,false);
+            let exitGateway = randomPercent(70) && containsExit && (this.countLeftRooms == (this.numberOfLeftRooms-1));
+            room.next.left = this.createRoom(false,true,false,exitGateway);
             room = room.next.left;
         }
         this.countLeftRooms++;
@@ -746,12 +764,13 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,nu
     room = this.mainRoom;
     while (this.countBottomRooms < this.numberOfBottomRooms) {
         if (room.passageBottom) {
-            if (containsHallway && randomPercent(40)) {
+            if (containsHallway && randomPercent(25)) {
                 room.next.bottom = this.createHallway(false);
                 room = room.next.bottom;
             }
 
-            room.next.bottom = this.createRoom(true,false,false);
+            let exitGateway = randomPercent(70) && containsExit && (this.countBottomRooms == (this.numberOfBottomRooms-1));
+            room.next.bottom = this.createRoom(true,false,false,exitGateway);
             room = room.next.bottom;
         }
         this.countBottomRooms++;
@@ -768,15 +787,15 @@ Map.prototype.createHallway = function(left) {
         false, /* Contains Exit Gateway */
         !left, /* Contains Top Door */
         left, /* Contains Left Door */
-        true /* Hallway */
+        true, /* Hallway */
+        false /* Auxiliary Room */
     );
     hallway.next = { bottom: undefined, left: undefined };
 
     return hallway;
 }
 
-Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway) {
-    let exitGateway = false;
+Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway,exitGateway) {
 
     let random = getRandomRoom( inputGateway ? 'small' : this.minorSize, this.majorSize );
     let room = new Room(
@@ -787,7 +806,8 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
         exitGateway, /* Contains Exit Gateway */
         containsTopDoor, /* Contains Top Door */
         constainsLeftDoor, /* Contains Left Door */
-        false /* Hallway */
+        false, /* Hallway */
+        false /* Auxiliary Room */
     );
 
     let passageBottom = false;
@@ -800,6 +820,43 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
     room.passageBottom = passageBottom;
     room.passageRight = passageRight;
     room.next = { bottom: undefined, left: undefined };
+
+    if (((this.countLeftRooms > 0) || this.flatAuxiliaryRoom) && passageBottom && (random.acceptBottomRoom > -1) && constainsLeftDoor && randomPercent(70)) {
+        let auxiliaryRoom = new Room(
+            this.context,
+            ROOMS[random.acceptBottomRoom],
+            true, /* Display */
+            false, /* Contains Input Gateway */
+            false, /* Contains Exit Gateway */
+            true, /* Contains Top Door */
+            false, /* Contains Left Door */
+            false, /* Hallway */
+            true /* Auxiliary Room */
+        );
+        auxiliaryRoom.passageBottom = false;
+        auxiliaryRoom.passageRight = false;
+        auxiliaryRoom.next = { bottom: undefined, left: undefined };
+        room.next.bottom = auxiliaryRoom;
+        if (this.countLeftRooms == 0) this.flatAuxiliaryRoom = false;
+    }
+    if (((this.countBottomRooms > 0) || this.flatAuxiliaryRoom) && passageRight && (random.acceptLeftRoom > -1) && containsTopDoor && randomPercent(70)) {
+        let auxiliaryRoom = new Room(
+            this.context,
+            ROOMS[random.acceptLeftRoom],
+            true, /* Display */
+            false, /* Contains Input Gateway */
+            false, /* Contains Exit Gateway */
+            false, /* Contains Top Door */
+            true, /* Contains Left Door */
+            false, /* Hallway */
+            true /* Auxiliary Room */
+        );
+        auxiliaryRoom.passageBottom = false;
+        auxiliaryRoom.passageRight = false;
+        auxiliaryRoom.next = { bottom: undefined, left: undefined };
+        room.next.left = auxiliaryRoom;
+        if (this.countBottomRooms == 0) this.flatAuxiliaryRoom = false;
+    }
 
     return room;
 }
@@ -945,7 +1002,7 @@ function resizeCanvas(dragging_x,dragging_y) {
     canvas.height = window.innerHeight - CANVAS_BORDER;
 
     if (map === undefined) {
-        map = new Map(canvas,context,5,'tiny','veryBig',true,0);
+        map = new Map(canvas,context,10,'tiny','veryBig',true,true);
     }
     map.render(dragging_x,dragging_y);
 }
