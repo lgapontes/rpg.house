@@ -4,6 +4,11 @@
 
 Editor Pixels Online: https://www.piskelapp.com/
 
+34:1
+69:21
+34:41
+1:21
+
 ## MacOS
 
 ### Access and use MongoDB

@@ -1,5 +1,5 @@
 /* Consts */
-const DEBUG = true;
+const DEBUG = false;
 
 const CANVAS_BORDER = 4;
 
@@ -463,16 +463,14 @@ function Door(context,type,open) {
 
     if (this.type === DOOR_TYPE.top) {
         if (!this.open) {
-            //this.images.push(new Image(this.context,'door-closed-top',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-            this.images.push(new Image(this.context,'door-open-top-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+            this.images.push(new Image(this.context,'door-closed-top',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
         } else {
             this.images.push(new Image(this.context,'door-open-top-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
             this.images.push(new Image(this.context,'door-open-top-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
         }
     } else if (this.type === DOOR_TYPE.left) {
         if (!this.open) {
-            //this.images.push(new Image(this.context,'door-closed-left',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-            this.images.push(new Image(this.context,'door-open-left-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+            this.images.push(new Image(this.context,'door-closed-left',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
         } else {
             this.images.push(new Image(this.context,'door-open-left-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
             this.images.push(new Image(this.context,'door-open-left-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
@@ -641,7 +639,13 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
     /* Top Door */
     this.topDoor = { x: 0, y: 0, nullable: true };
     if (containsTopDoor && !inputDefined && (indexesInputGateway.length > 0)) {
-        let start = Math.floor(indexesInputGateway.length / 2);
+        let start = Math.floor(indexesInputGateway.length / 2) + 1;
+        if (indexesInputGateway.length >= 5) {
+            if (randomBoolean()) start = indexesInputGateway.length-2;
+            else start = indexesInputGateway.length-1;
+        }
+        if (start == indexesInputGateway.length) start = indexesInputGateway.length-1;
+
         for (let i=start; i < indexesInputGateway.length; i++) {
             let tile = this.tiles[ indexesInputGateway[i] ];
             if (this.topDoor.nullable && (randomPercent(75) || (i == (indexesInputGateway.length-1)))) {
@@ -701,43 +705,52 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,nu
     this.canvas = canvas;
     this.context = context;
 
-    this.countRooms = -1;
-    this.numberOfRooms = numberOfRooms;
+    this.numberOfBottomRooms = Math.floor(numberOfRooms / 2);
+    this.countBottomRooms = 0;
+    this.numberOfLeftRooms = (numberOfRooms - this.numberOfBottomRooms) - 1;
+    this.countLeftRooms = 0;
+    console.log(this.numberOfBottomRooms);
+    console.log(this.numberOfLeftRooms);
+
+    this.bufferNext = undefined;
 
     this.minorSize = minorSize;
     this.majorSize = majorSize;
-
-    this.mapLinks = [];
-    for(let count=0; count<this.numberOfRooms; count++) {
-        let left = (count%2 === 0);
-        this.mapLinks.push({
-            bottom: !left || (count === 0),
-            left: left || (count === 0)
-        });
-    }
 
     let hallwayRight = false;
     let hallwayBottom = false;
     let exitLimit = Math.floor(numberOfRooms / 2);
     let countExits = 0;
 
-    this.mainRoom = this.createRoom(false,false);
-}
+    /* Create Main Room */
+    this.mainRoom = this.createRoom(false,false,true);
 
-Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor) {
-    this.countRooms++;
-    if (this.countRooms == this.numberOfRooms) {
-        this.countRooms--;
-        return;
+    let room = this.mainRoom;
+    while (this.countLeftRooms < this.numberOfLeftRooms) {
+        if (room.passageRight) {
+            room.next.left = this.createRoom(false,true,false);
+            room = room.next.left;
+        }
+        this.countLeftRooms++;
     }
 
-    let inputGateway = (this.countRooms === 0);
-    let exitGateway = false;
-    console.log(this.mapLinks);
-    console.log(this.countRooms);
-    let mapLink = this.mapLinks[this.countRooms];
+    room = this.mainRoom;
+    while (this.countBottomRooms < this.numberOfBottomRooms) {
+        if (room.passageBottom) {
+            room.next.bottom = this.createRoom(true,false,false);
+            room = room.next.bottom;
+        }
+        this.countBottomRooms++;
+    }
+}
 
-    let scaffold = getRandomRoom(this.minorSize,this.majorSize);
+Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway) {
+    let exitGateway = false;
+
+    let scaffold = getRandomRoom(
+        inputGateway ? 'small' : this.minorSize,
+        this.majorSize
+    );
     let room = new Room(
         this.context,
         scaffold,
@@ -755,12 +768,10 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor) {
         if (passage.isBottom()) passageBottom = true;
         if (passage.isRight()) passageRight = true;
     });
+    room.passageBottom = passageBottom;
+    room.passageRight = passageRight;
+    room.next = { bottom: undefined, left: undefined };
 
-    let next = { bottom: undefined, left: undefined };
-    if (passageBottom && mapLink.bottom) next.bottom = this.createRoom(true,false);
-    if (passageRight && mapLink.left) next.left = this.createRoom(false,true);
-
-    room.next = next;
     return room;
 }
 
@@ -777,14 +788,18 @@ Map.prototype.renderRoom = function(room,x,y) {
     let passages = room.getPassages();
 
     if (room.next.bottom !== undefined) {
-        let printX = passages[0].x - room.next.bottom.topDoor.x;
-        let printY = passages[0].y - room.next.bottom.topDoor.y;
-        this.renderRoom(room.next.bottom,printX,printY);
+        if (passages[0] !== undefined) {
+            let printX = passages[0].x - room.next.bottom.topDoor.x;
+            let printY = passages[0].y - room.next.bottom.topDoor.y;
+            this.renderRoom(room.next.bottom,printX,printY);
+        }
     }
     if (room.next.left !== undefined) {
-        let printX = passages[1].x - room.next.left.leftDoor.x;
-        let printY = passages[1].y - room.next.left.leftDoor.y;
-        this.renderRoom(room.next.left,printX,printY);
+        if (passages[1] !== undefined) {
+            let printX = passages[1].x - room.next.left.leftDoor.x;
+            let printY = passages[1].y - room.next.left.leftDoor.y;
+            this.renderRoom(room.next.left,printX,printY);
+        }
     }
 }
 
@@ -877,7 +892,7 @@ function resizeCanvas(dragging_x,dragging_y) {
     canvas.height = window.innerHeight - CANVAS_BORDER;
 
     if (map === undefined) {
-        map = new Map(canvas,context,3,'tiny','veryBig',false,0);
+        map = new Map(canvas,context,5,'tiny','veryBig',false,0);
     }
     map.render(dragging_x,dragging_y);
 }
