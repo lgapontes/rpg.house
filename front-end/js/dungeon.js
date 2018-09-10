@@ -361,12 +361,14 @@ const ROOMS = [
 ];
 
 const DOOR_TYPE = {
-    top: { x: 6, y: -70 },
-    left: { x: -28, y: -70 },
+    top: { x: 9, y: -73 },
+    left: { x: -32, y: -74 },
 };
 
 /* User Interface */
 let SHOW_INDEXES = DEBUG;
+
+let DOORS = [];
 
 /* Model */
 function Mouse() {
@@ -379,6 +381,7 @@ function Mouse() {
 }
 
 Mouse.prototype.mousedown = function(x,y) {
+    checkDoorClick(x,y);
     this.dragging = true;
     this.start_x = x;
     this.start_y = y;
@@ -394,7 +397,7 @@ Mouse.prototype.mousemove = function(x,y,callback) {
     }
 }
 
-Mouse.prototype.mouseup = function(x,y) {
+Mouse.prototype.mouseup = function() {
     this.memory = this.diff();
     this.dragging = false;
     this.start_x = 0;
@@ -456,28 +459,48 @@ Passage.prototype.isRight = function() {
 function Door(context,type,open) {
     this.context = context;
     this.type = type;
-    this.open = open;
+    this.open = false;
     this.images = [];
+    this.setArea(0,0);
 
     if (this.type === DOOR_TYPE.top) {
-        if (!this.open) {
-            this.images.push(new Image(this.context,'door-closed-top',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-        } else {
-            this.images.push(new Image(this.context,'door-open-top-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-            this.images.push(new Image(this.context,'door-open-top-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-        }
+        this.images.push(new Image(this.context,'door-closed-top',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
     } else if (this.type === DOOR_TYPE.left) {
-        if (!this.open) {
-            this.images.push(new Image(this.context,'door-closed-left',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-        } else {
-            this.images.push(new Image(this.context,'door-open-left-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-            this.images.push(new Image(this.context,'door-open-left-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+        this.images.push(new Image(this.context,'door-closed-left',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+    }
+}
+
+Door.prototype.setArea = function(x,y) {
+    this.area = {
+        a: {x: x, y: y},
+        b: {x: x + DOOR_WIDTH, y: y + DOOR_HEIGHT}
+    };
+}
+
+Door.prototype.click = function(x,y) {
+    if (this.open) return false;
+
+    if ( (x >= this.area.a.x) && (x <= this.area.b.x) ) {
+        if ( (y >= this.area.a.y) && (y <= this.area.b.y) ) {
+            this.open = true;
+            this.images = [];
+
+            if (this.type === DOOR_TYPE.top) {
+                this.images.push(new Image(this.context,'door-open-top-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+                this.images.push(new Image(this.context,'door-open-top-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+            } else if (this.type === DOOR_TYPE.left) {
+                this.images.push(new Image(this.context,'door-open-left-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+                this.images.push(new Image(this.context,'door-open-left-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+            }
+
+            return true;
         }
     }
 }
 
 Door.prototype.render = function(x,y) {
     let type = this.type;
+    this.setArea(x+type.x,y+type.y);
     this.images.forEach(function(image){
         image.render(x+type.x,y+type.y);
     });
@@ -518,7 +541,8 @@ Tile.prototype.setExitGateway = function() {
 }
 
 Tile.prototype.createDoor = function(type) {
-    this.door = new Door(this.context,type,false);
+    this.door = new Door(this.context,type);
+    DOORS.push(this.door);
 }
 
 Tile.prototype.createPassage = function(link) {
@@ -526,13 +550,13 @@ Tile.prototype.createPassage = function(link) {
     return this.passage;
 }
 
-Tile.prototype.render = function(x,y) {
-    Image.prototype.render.call(this,x,y);
+Tile.prototype.render = function(x,y,open,next) {
+    if (open) Image.prototype.render.call(this,x,y);
     this.memory.x = x;
     this.memory.y = y;
     if (this.passage !== undefined) { this.passage.setPosition(x,y); }
 
-    if (SHOW_INDEXES) {
+    if (open && SHOW_INDEXES) {
         this.context.font=DEFAULT_FONT_FAMILY;
         this.context.fillStyle = DEFAULT_FONT_COLOR;
         let label = this.index;
@@ -558,23 +582,25 @@ Tile.prototype.render = function(x,y) {
         );
     }
 
-    this.borders.top.render(x,y);
-    this.borders.right.render(x,y);
-    this.borders.bottom.render(x,y);
-    this.borders.left.render(x,y);
+    if (open) {
+        this.borders.top.render(x,y);
+        this.borders.right.render(x,y);
+        this.borders.bottom.render(x,y);
+        this.borders.left.render(x,y);
+    }
 
-    if (this.inputGateway !== undefined) {
+    if (open && (this.inputGateway !== undefined)) {
         this.inputGateway.render(x+6,y-70);
     }
-    if (this.door !== undefined) {
+    if ((open || next) && (this.door !== undefined)) {
         this.door.render(x,y);
     }
-    if (this.exitGateway !== undefined) {
+    if (open && (this.exitGateway !== undefined)) {
         this.exitGateway.render(x-29,y-51);
     }
 }
 
-function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway,isAuxiliary) {
+function Room(context,randomSize,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway,isAuxiliary) {
     let indexesInputGateway = [];
     let indexesExitGateway = [];
     let indexesBottomPassage = [];
@@ -598,14 +624,14 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
 
     this.context = context;
     this.tiles = tiles;
-    this.display = display;
     this.isHallway = isHallway;
+    this.isAuxiliary = isAuxiliary;
 
-    let inputDefined = false;
+    this.inputDefined = false;
     if (inputGateway && indexesInputGateway.length > 0) {
         let indexInputGateway = indexesInputGateway[random(indexesInputGateway.length)];
         this.tiles[indexInputGateway].setInputGateway();
-        inputDefined = true;
+        this.inputDefined = true;
     }
     let exitDefined = false;
     if (exitGateway && indexesExitGateway.length > 0) {
@@ -647,8 +673,8 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
     }
 
     /* Top Door */
-    this.topDoor = { x: 0, y: 0, nullable: true };
-    if (containsTopDoor && !inputDefined && (indexesTopDoor.length > 0)) {
+    this.topDoor = { x: 0, y: 0, nullable: true, pointer: undefined };
+    if (containsTopDoor && !this.inputDefined && (indexesTopDoor.length > 0)) {
         if (isAuxiliary) {
             let index = 0;
             let tile = this.tiles[ indexesTopDoor[index] ];
@@ -657,6 +683,7 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
             this.topDoor.x = multiplier * LINKS.right.x;
             this.topDoor.y = multiplier * LINKS.right.y;
             this.topDoor.nullable = false;
+            this.topDoor.pointer = tile;
         } else {
             let start = Math.floor(indexesTopDoor.length / 2) + 1;
             if (indexesTopDoor.length >= 5) {
@@ -672,13 +699,14 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
                     this.topDoor.x = multiplier * LINKS.right.x;
                     this.topDoor.y = multiplier * LINKS.right.y;
                     this.topDoor.nullable = false;
+                    this.topDoor.pointer = tile;
                 }
             }
         }
     }
 
     /* Left Door */
-    this.leftDoor = { x: 0, y: 0, nullable: true };
+    this.leftDoor = { x: 0, y: 0, nullable: true, pointer: undefined };
     if (containsLeftDoor && indexesLeftDoor.length > 0) {
         if (isAuxiliary) {
             let index = 0;
@@ -688,6 +716,7 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
             this.leftDoor.x = multiplier * LINKS.bottom.x;
             this.leftDoor.y = multiplier * LINKS.bottom.y;
             this.leftDoor.nullable = false;
+            this.leftDoor.pointer = tile;
         } else {
             let start = Math.floor(indexesLeftDoor.length / 2) + 1;
             if (start >= indexesLeftDoor.length) start--;
@@ -699,10 +728,29 @@ function Room(context,randomSize,display,inputGateway,exitGateway,containsTopDoo
                     this.leftDoor.x = multiplier * LINKS.bottom.x;
                     this.leftDoor.y = multiplier * LINKS.bottom.y;
                     this.leftDoor.nullable = false;
+                    this.leftDoor.pointer = tile;
                 }
             }
         }
     }
+}
+
+Room.prototype.doorIsOpen = function() {
+    let open = this.inputDefined;
+    if ( (!this.topDoor.nullable) && (this.topDoor.pointer.door.open) ) {
+        open = true;
+    }
+    if ( (!this.leftDoor.nullable) && (this.leftDoor.pointer.door.open) ) {
+        open = true;
+    }
+    return open;
+}
+
+Room.prototype.parentIsVisited = function() {
+    if (this.parent !== undefined) {
+        return this.parent.doorIsOpen();
+    }
+    return false;
 }
 
 Room.prototype.getPassages = function() {
@@ -717,13 +765,15 @@ Room.prototype.getPassages = function() {
 }
 
 Room.prototype.render = function(x,y) {
-    if (!this.display) return;
+    let open = this.doorIsOpen();
+    let next = this.parentIsVisited();
     let tiles = this.tiles;
+
     tiles.forEach(function(tile){
         let link = tile.origin.link;
         let baseAxes = { x: x, y: y };
         if (tile.origin.baseIndex > -1) { baseAxes = tiles[tile.origin.baseIndex].memory; }
-        tile.render(baseAxes.x+link.x,baseAxes.y+link.y);
+        tile.render(baseAxes.x+link.x,baseAxes.y+link.y,open,next);
     });
 }
 
@@ -745,17 +795,20 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,co
 
     /* Create Main Room */
     this.mainRoom = this.createRoom(false,false,true,false);
+    this.mainRoom.parent = undefined;
 
     let room = this.mainRoom;
     while (this.countLeftRooms < this.numberOfLeftRooms) {
         if (room.passageRight) {
             if (containsHallway && randomPercent(25)) {
                 room.next.left = this.createHallway(true);
+                room.next.left.parent = room;
                 room = room.next.left;
             }
 
             let exitGateway = randomPercent(70) && containsExit && (this.countLeftRooms == (this.numberOfLeftRooms-1));
             room.next.left = this.createRoom(false,true,false,exitGateway);
+            room.next.left.parent = room;
             room = room.next.left;
         }
         this.countLeftRooms++;
@@ -766,11 +819,13 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,co
         if (room.passageBottom) {
             if (containsHallway && randomPercent(25)) {
                 room.next.bottom = this.createHallway(false);
+                room.next.bottom.parent = room;
                 room = room.next.bottom;
             }
 
             let exitGateway = randomPercent(70) && containsExit && (this.countBottomRooms == (this.numberOfBottomRooms-1));
             room.next.bottom = this.createRoom(true,false,false,exitGateway);
+            room.next.bottom.parent = room;
             room = room.next.bottom;
         }
         this.countBottomRooms++;
@@ -782,7 +837,6 @@ Map.prototype.createHallway = function(left) {
     let hallway = new Room(
         this.context,
         random.scaffold,
-        true, /* Display */
         false, /* Contains Input Gateway */
         false, /* Contains Exit Gateway */
         !left, /* Contains Top Door */
@@ -797,11 +851,10 @@ Map.prototype.createHallway = function(left) {
 
 Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway,exitGateway) {
 
-    let random = getRandomRoom( inputGateway ? 'small' : this.minorSize, this.majorSize );
+    let random = getRandomRoom( inputGateway ? 'medium' : this.minorSize, this.majorSize );
     let room = new Room(
         this.context,
         random.scaffold,
-        true, /* Display */
         inputGateway, /* Contains Input Gateway */
         exitGateway, /* Contains Exit Gateway */
         containsTopDoor, /* Contains Top Door */
@@ -825,7 +878,6 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
         let auxiliaryRoom = new Room(
             this.context,
             ROOMS[random.acceptBottomRoom],
-            true, /* Display */
             false, /* Contains Input Gateway */
             false, /* Contains Exit Gateway */
             true, /* Contains Top Door */
@@ -838,12 +890,12 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
         auxiliaryRoom.next = { bottom: undefined, left: undefined };
         room.next.bottom = auxiliaryRoom;
         if (this.countLeftRooms == 0) this.flatAuxiliaryRoom = false;
+        auxiliaryRoom.parent = room;
     }
     if (((this.countBottomRooms > 0) || this.flatAuxiliaryRoom) && passageRight && (random.acceptLeftRoom > -1) && containsTopDoor && randomPercent(70)) {
         let auxiliaryRoom = new Room(
             this.context,
             ROOMS[random.acceptLeftRoom],
-            true, /* Display */
             false, /* Contains Input Gateway */
             false, /* Contains Exit Gateway */
             false, /* Contains Top Door */
@@ -856,6 +908,7 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
         auxiliaryRoom.next = { bottom: undefined, left: undefined };
         room.next.left = auxiliaryRoom;
         if (this.countBottomRooms == 0) this.flatAuxiliaryRoom = false;
+        auxiliaryRoom.parent = room;
     }
 
     return room;
@@ -964,7 +1017,7 @@ function getRandomRoom(minorInclusive,majorInclusive) {
 
 function acceptAuxiliaryRoom(index) {
     if (index >= 17) return 9;
-    if (index >= 12) return 8;
+    if (index >= 13) return 8;
     return -1;
 }
 
@@ -988,6 +1041,20 @@ function createTileBorders(context,scaffold) {
         borders.left = new Image(context,'tile-corner-left',TILE_WIDTH,TILE_HEIGHT,DEFAULT_PERCENT);
     }
     return borders;
+}
+
+function checkDoorClick(x,y) {
+    let clicked = false;
+    let count = 0;
+    while (!clicked && (count < DOORS.length)) {
+        let door = DOORS[count];
+        if (door.click(x,y)) {
+            let diff = mouse.diff();
+            resizeCanvas(diff.x,diff.y);
+            clicked = true;
+        }
+        count++;
+    }
 }
 
 function setDungeonName() {
@@ -1043,17 +1110,17 @@ dungeon.addEventListener('mouseup', function(event){
     event.stopPropagation();
 }, false);
 
-dungeon.addEventListener("touchstart", function(event){
+dungeon.addEventListener('touchstart', function(event){
     let touch = event.touches[0];
     mouse.mousedown(touch.pageX,touch.pageY);
     event.stopPropagation();
 }, false);
-dungeon.addEventListener("touchmove", function(event){
+dungeon.addEventListener('touchmove', function(event){
     let touch = event.touches[0];
     mouse.mousemove(touch.pageX,touch.pageY,resizeCanvas);
     event.stopPropagation();
 }, false);
-dungeon.addEventListener("touchend", function(event){
+dungeon.addEventListener('touchend', function(event){
     mouse.mouseup();
     event.stopPropagation();
 }, false);
