@@ -345,19 +345,20 @@ const ROOM_SIZE = {
 };
 
 const ROOMS = [
-    /*** hallway ***/
+    /*** hallway 0-3 ***/
     ROOM_SIZE.hallway.s1x3, ROOM_SIZE.hallway.s1x4, ROOM_SIZE.hallway.s1x5, ROOM_SIZE.hallway.s1x6,
+    /*** hallway 4-7 ***/
     ROOM_SIZE.hallway.s3x1, ROOM_SIZE.hallway.s4x1, ROOM_SIZE.hallway.s5x1, ROOM_SIZE.hallway.s6x1,
-    /*** tiny ***/
+    /*** tiny 8 ***/
     ROOM_SIZE.tiny.s2x2,
-    /*** small ***/
+    /*** small 9-11 ***/
     ROOM_SIZE.small.s3x2, ROOM_SIZE.small.s2x3, ROOM_SIZE.small.s3x3,
-    /*** medium ***/
+    /*** medium 12-16 ***/
     ROOM_SIZE.medium.s4x2, ROOM_SIZE.medium.s4x3, ROOM_SIZE.medium.s4x4, ROOM_SIZE.medium.s2x4, ROOM_SIZE.medium.s3x4,
-    /*** big ***/
+    /*** big 17-20 ***/
     ROOM_SIZE.big.s5x3, ROOM_SIZE.big.s5x4, ROOM_SIZE.big.s4x5, ROOM_SIZE.big.s5x5,
-    /*** veryBig ***/
-    ROOM_SIZE.veryBig.s7x7 // index=21
+    /*** veryBig 21 ***/
+    ROOM_SIZE.veryBig.s7x7
 ];
 
 const DOOR_TYPE = {
@@ -365,8 +366,13 @@ const DOOR_TYPE = {
     left: { x: -32, y: -74 },
 };
 
+const MAP_SIZE = {
+    // TO-DO
+};
+
 /* User Interface */
 let SHOW_INDEXES = DEBUG;
+let SHOW_ALL_ROOMS = DEBUG;
 
 let DOORS = [];
 
@@ -421,16 +427,16 @@ Mouse.prototype.diff = function() {
     return diff;
 }
 
-function Image(context,id,width,height,percent=1) {
+function Image(context,file,width,height,percent=1) {
     this.context = context;
-    this.file=document.getElementById(id);
+    this.file=file;
     this.width = width * percent;
     this.height = height * percent;
 }
 
 Image.prototype.render = function(x,y) {
     this.context.drawImage(
-        this.file,
+        document.getElementById(this.file),
         x,y,
         this.width,
         this.height
@@ -482,23 +488,26 @@ Door.prototype.click = function(x,y) {
 
     if ( (x >= this.area.a.x) && (x <= this.area.b.x) ) {
         if ( (y >= this.area.a.y) && (y <= this.area.b.y) ) {
-            this.open = true;
-            this.images = [];
-
-            if (this.type === DOOR_TYPE.top) {
-                this.images.push(new Image(this.context,'door-open-top-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-                this.images.push(new Image(this.context,'door-open-top-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-            } else if (this.type === DOOR_TYPE.left) {
-                this.images.push(new Image(this.context,'door-open-left-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-                this.images.push(new Image(this.context,'door-open-left-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
-            }
-
+            this.updateImages();
             return true;
         }
     }
 }
 
+Door.prototype.updateImages = function() {
+    this.open = true;
+    this.images = [];
+    if (this.type === DOOR_TYPE.top) {
+        this.images.push(new Image(this.context,'door-open-top-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+        this.images.push(new Image(this.context,'door-open-top-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+    } else if (this.type === DOOR_TYPE.left) {
+        this.images.push(new Image(this.context,'door-open-left-border',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+        this.images.push(new Image(this.context,'door-open-left-transparent',DOOR_WIDTH,DOOR_HEIGHT,DEFAULT_PERCENT));
+    }
+}
+
 Door.prototype.render = function(x,y) {
+    if (SHOW_ALL_ROOMS) this.updateImages();
     let type = this.type;
     this.setArea(x+type.x,y+type.y);
     this.images.forEach(function(image){
@@ -765,8 +774,8 @@ Room.prototype.getPassages = function() {
 }
 
 Room.prototype.render = function(x,y) {
-    let open = this.doorIsOpen();
-    let next = this.parentIsVisited();
+    let open = this.doorIsOpen() || SHOW_ALL_ROOMS;
+    let next = this.parentIsVisited() || SHOW_ALL_ROOMS;
     let tiles = this.tiles;
 
     tiles.forEach(function(tile){
@@ -793,47 +802,94 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,co
     this.majorSize = majorSize;
     this.flatAuxiliaryRoom = true;
 
+    this.model = randomBetween(0,3);
+    this.containsHallway = containsHallway;
+    this.containsExit = containsExit;
+    this.focusedRoom = undefined;
+
     /* Create Main Room */
-    this.mainRoom = this.createRoom(false,false,true,false);
+    this.mainRoom = this.createRoom(false,false,true,false,false,false,false,-1);
     this.mainRoom.parent = undefined;
 
-    let room = this.mainRoom;
+    if (this.model === 0) {
+        let room = this.mainRoom;
+        this.createLeftRooms(room);
+        room = this.mainRoom;
+        this.createBottomRooms(room);
+    } else if (this.model === 1) {
+        let room = this.mainRoom;
+        room = this.createBottomRooms(room);
+        if (this.focusedRoom !== undefined) {
+            room = this.focusedRoom.room;
+        }
+        this.createLeftRooms(room);
+    } else if (this.model === 2) {
+        let room = this.mainRoom;
+        room = this.createLeftRooms(room);
+        if (this.focusedRoom !== undefined) {
+            room = this.focusedRoom.room;
+        }
+        this.createBottomRooms(room);
+    }
+
+}
+
+Map.prototype.createLeftRooms = function(room) {
+    let percentHallway = (this.model === 2) ? 80 : 25;
+
     while (this.countLeftRooms < this.numberOfLeftRooms) {
         if (room.passageRight) {
-            if (containsHallway && randomPercent(25)) {
-                room.next.left = this.createHallway(true);
+            let isFirst = (this.countLeftRooms === 0);
+            let isLast = (this.countLeftRooms == (this.numberOfLeftRooms-1));
+            let requiredHallway = (this.model === 2) && isLast;
+            let isSecondAndRequiredHallway = (this.countLeftRooms === 1) && (this.model === 1);
+            let randomScaffold = { index: -1 };
+            if (!isFirst && (requiredHallway || isSecondAndRequiredHallway || (this.containsHallway && randomPercent(percentHallway)))) {
+                randomScaffold = this.createHallway(true,requiredHallway);
+                room.next.left = randomScaffold.hallway;
                 room.next.left.parent = room;
                 room = room.next.left;
             }
 
-            let exitGateway = randomPercent(70) && containsExit && (this.countLeftRooms == (this.numberOfLeftRooms-1));
-            room.next.left = this.createRoom(false,true,false,exitGateway);
+            let exitGateway = this.containsExit && isLast && (this.model !== 2);
+            room.next.left = this.createRoom(false,true,false,exitGateway,isFirst,isSecondAndRequiredHallway,isLast,randomScaffold.index);
             room.next.left.parent = room;
             room = room.next.left;
         }
         this.countLeftRooms++;
     }
+    return room;
+}
 
-    room = this.mainRoom;
+Map.prototype.createBottomRooms = function(room) {
+    let percentHallway = (this.model === 1) ? 80 : 25;
+
     while (this.countBottomRooms < this.numberOfBottomRooms) {
         if (room.passageBottom) {
-            if (containsHallway && randomPercent(25)) {
-                room.next.bottom = this.createHallway(false);
+            let isFirst = (this.countBottomRooms === 0);
+            let isLast = (this.countBottomRooms == (this.numberOfBottomRooms-1));
+            let requiredHallway = (this.model === 1) && isLast;
+            let isSecondAndRequiredHallway = (this.countBottomRooms === 1) && (this.model === 2);
+            let randomScaffold = { index: -1 };
+            if (!isFirst && (requiredHallway || isSecondAndRequiredHallway || (this.containsHallway && randomPercent(percentHallway)))) {
+                randomScaffold = this.createHallway(false,requiredHallway);
+                room.next.bottom = randomScaffold.hallway;
                 room.next.bottom.parent = room;
                 room = room.next.bottom;
             }
 
-            let exitGateway = randomPercent(70) && containsExit && (this.countBottomRooms == (this.numberOfBottomRooms-1));
-            room.next.bottom = this.createRoom(true,false,false,exitGateway);
+            let exitGateway = this.containsExit && isLast && (this.model !== 1);
+            room.next.bottom = this.createRoom(true,false,false,exitGateway,isFirst,isSecondAndRequiredHallway,isLast,randomScaffold.index);
             room.next.bottom.parent = room;
             room = room.next.bottom;
         }
         this.countBottomRooms++;
     }
+    return room;
 }
 
-Map.prototype.createHallway = function(left) {
-    let random = left ? getRandomLeftHallway() : getRandomBottomHallway();
+Map.prototype.createHallway = function(left,requiredHallway) {
+    let random = left ? getRandomLeftHallway(requiredHallway) : getRandomBottomHallway(requiredHallway);
     let hallway = new Room(
         this.context,
         random.scaffold,
@@ -846,12 +902,28 @@ Map.prototype.createHallway = function(left) {
     );
     hallway.next = { bottom: undefined, left: undefined };
 
-    return hallway;
+    return {
+        index: random.index,
+        hallway: hallway
+    };
 }
 
-Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway,exitGateway) {
+Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway,exitGateway,isFirst,isSecond,isLast,indexHallway) {
 
     let random = getRandomRoom( inputGateway ? 'medium' : this.minorSize, this.majorSize );
+
+    if (isFirst && (this.focusedRoom !== undefined)) {
+        let indexFocusedRoom = this.focusedRoom.fork[randomBetween(0,this.focusedRoom.fork.length)];
+        random.index = indexFocusedRoom;
+        random.scaffold = ROOMS[indexFocusedRoom];
+    }
+
+    if (isSecond && (this.focusedRoom !== undefined)) {
+        let indexSecondRoom = this.focusedRoom.secondRange[randomBetween(0,this.focusedRoom.secondRange.length)];
+        random.index = indexSecondRoom;
+        random.scaffold = ROOMS[indexSecondRoom];
+    }
+
     let room = new Room(
         this.context,
         random.scaffold,
@@ -874,41 +946,60 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
     room.passageRight = passageRight;
     room.next = { bottom: undefined, left: undefined };
 
-    if (((this.countLeftRooms > 0) || this.flatAuxiliaryRoom) && passageBottom && (random.acceptBottomRoom > -1) && constainsLeftDoor && randomPercent(70)) {
-        let auxiliaryRoom = new Room(
-            this.context,
-            ROOMS[random.acceptBottomRoom],
-            false, /* Contains Input Gateway */
-            false, /* Contains Exit Gateway */
-            true, /* Contains Top Door */
-            false, /* Contains Left Door */
-            false, /* Hallway */
-            true /* Auxiliary Room */
-        );
-        auxiliaryRoom.passageBottom = false;
-        auxiliaryRoom.passageRight = false;
-        auxiliaryRoom.next = { bottom: undefined, left: undefined };
-        room.next.bottom = auxiliaryRoom;
-        if (this.countLeftRooms == 0) this.flatAuxiliaryRoom = false;
-        auxiliaryRoom.parent = room;
+    let fork = [];
+    if (randomBoolean() && (this.focusedRoom === undefined)) {
+        fork = forkRange(indexHallway);
+        console.log(indexHallway);
+
+        if (fork.length > 0) {
+            this.focusedRoom = {
+                fork: fork,
+                secondRange: [ 9, 10, 11, 12, 13, 14, 15, 16 ],
+                room: room
+            };
+        }
     }
-    if (((this.countBottomRooms > 0) || this.flatAuxiliaryRoom) && passageRight && (random.acceptLeftRoom > -1) && containsTopDoor && randomPercent(70)) {
-        let auxiliaryRoom = new Room(
-            this.context,
-            ROOMS[random.acceptLeftRoom],
-            false, /* Contains Input Gateway */
-            false, /* Contains Exit Gateway */
-            false, /* Contains Top Door */
-            true, /* Contains Left Door */
-            false, /* Hallway */
-            true /* Auxiliary Room */
-        );
-        auxiliaryRoom.passageBottom = false;
-        auxiliaryRoom.passageRight = false;
-        auxiliaryRoom.next = { bottom: undefined, left: undefined };
-        room.next.left = auxiliaryRoom;
-        if (this.countBottomRooms == 0) this.flatAuxiliaryRoom = false;
-        auxiliaryRoom.parent = room;
+
+    if ( !(isLast && (this.model === 2)) && !(fork.length > 0) && !(isFirst && (this.focusedRoom !== undefined)) ) {
+        if (((this.countLeftRooms > 0) || this.flatAuxiliaryRoom) && passageBottom && (random.acceptBottomRoom > -1) && constainsLeftDoor && randomPercent(70)) {
+            let auxiliaryRoom = new Room(
+                this.context,
+                ROOMS[random.acceptBottomRoom],
+                false, /* Contains Input Gateway */
+                false, /* Contains Exit Gateway */
+                true, /* Contains Top Door */
+                false, /* Contains Left Door */
+                false, /* Hallway */
+                true /* Auxiliary Room */
+            );
+            auxiliaryRoom.passageBottom = false;
+            auxiliaryRoom.passageRight = false;
+            auxiliaryRoom.next = { bottom: undefined, left: undefined };
+            room.next.bottom = auxiliaryRoom;
+            if (this.countLeftRooms == 0) this.flatAuxiliaryRoom = false;
+            auxiliaryRoom.parent = room;
+        }
+    }
+
+    if ( !(isLast && (this.model === 1)) && !(fork.length > 0) && !(isFirst && (this.focusedRoom !== undefined)) ) {
+        if (((this.countBottomRooms > 0) || this.flatAuxiliaryRoom) && passageRight && (random.acceptLeftRoom > -1) && containsTopDoor && randomPercent(70)) {
+            let auxiliaryRoom = new Room(
+                this.context,
+                ROOMS[random.acceptLeftRoom],
+                false, /* Contains Input Gateway */
+                false, /* Contains Exit Gateway */
+                false, /* Contains Top Door */
+                true, /* Contains Left Door */
+                false, /* Hallway */
+                true /* Auxiliary Room */
+            );
+            auxiliaryRoom.passageBottom = false;
+            auxiliaryRoom.passageRight = false;
+            auxiliaryRoom.next = { bottom: undefined, left: undefined };
+            room.next.left = auxiliaryRoom;
+            if (this.countBottomRooms == 0) this.flatAuxiliaryRoom = false;
+            auxiliaryRoom.parent = room;
+        }
     }
 
     return room;
@@ -947,7 +1038,7 @@ Map.prototype.render = function(dragging_x,dragging_y) {
 
     /* Calc center of viewport */
     let center = {
-        x: Math.round( this.canvas.width / 2 ),
+        x: Math.round( this.canvas.width / 3 ),
         y: Math.round( this.canvas.height / 4 ),
     };
 
@@ -984,19 +1075,33 @@ function randomBetween(minInclusive, maxExclusive) {
     return Math.floor(Math.random() * (maxExclusive - minInclusive) ) + minInclusive;
 }
 
-function getRandomBottomHallway() {
+function getRandomBottomHallway(requiredHallway) {
+    let indexScaffold = requiredHallway ? 3 : randomBetween(0, 4);
     return {
-        scaffold: ROOMS[randomBetween(0, 4)],
+        index: indexScaffold,
+        scaffold: ROOMS[indexScaffold],
         acceptBottomRoom: -1,
         acceptLeftRoom: -1
     };
 }
-function getRandomLeftHallway() {
+function getRandomLeftHallway(requiredHallway) {
+    let indexScaffold = requiredHallway ? 7 : randomBetween(4, 8);
     return {
-        scaffold: ROOMS[randomBetween(4, 8)],
+        index: indexScaffold,
+        scaffold: ROOMS[indexScaffold],
         acceptBottomRoom: -1,
         acceptLeftRoom: -1
     };
+}
+
+function forkRange(indexHallway) {
+    if ( (indexHallway >= 0) && (indexHallway <= 3) ) {
+        return [ 9, 12 ];
+    }
+    if ( (indexHallway >= 4) && (indexHallway <= 7) ) {
+        return [ 10, 15 ];
+    }
+    return [];
 }
 
 function getRandomRoom(minorInclusive,majorInclusive) {
@@ -1008,6 +1113,7 @@ function getRandomRoom(minorInclusive,majorInclusive) {
     if (majorInclusive === 'veryBig') { majorExclusive = 22; }
     let indexScaffold = randomBetween(sizes[minorInclusive],majorExclusive);
     let random = {
+        index: indexScaffold,
         scaffold: ROOMS[indexScaffold],
         acceptBottomRoom: acceptAuxiliaryRoom(indexScaffold),
         acceptLeftRoom: acceptAuxiliaryRoom(indexScaffold)
