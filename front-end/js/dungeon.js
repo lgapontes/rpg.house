@@ -12,6 +12,9 @@ const GATEWAY_HEIGHT = 95;
 const DOOR_WIDTH = 95;
 const DOOR_HEIGHT = 95;
 
+const STAIRS_WIDTH = 115;
+const STAIRS_HEIGHT = 70;
+
 const DEFAULT_PERCENT = 1;
 const DEFAULT_FONT_FAMILY = 'bold 16px monospace';
 const DEFAULT_FONT_COLOR = '#523e07';
@@ -373,6 +376,8 @@ const MAP_SIZE = {
 /* User Interface */
 let SHOW_INDEXES = DEBUG;
 let SHOW_ALL_ROOMS = DEBUG;
+let NUMBER_OF_FLOOR = 10;
+let NUMBER_OF_LAST_FLOOR = 10;
 
 let DOORS = [];
 
@@ -525,28 +530,50 @@ function Tile(context,scaffold) {
     this.acceptGateway = scaffold.acceptGateway;
     this.acceptDoor = scaffold.acceptDoor;
     this.acceptExit = scaffold.acceptExit;
+    this.gatewayStairs = scaffold.gatewayStairs;
+    this.exitStairs = scaffold.exitStairs;
     this.borders = createTileBorders(context,scaffold);
     this.passage = undefined;
 }
 
 Tile.prototype.setInputGateway = function() {
-    this.inputGateway = new Image(
-        this.context,
-        'gateway',
-        GATEWAY_WIDTH,
-        GATEWAY_HEIGHT,
-        DEFAULT_PERCENT
-    );
+    if (this.gatewayStairs) {
+        this.inputGateway = new Image(
+            this.context,
+            'stairs',
+            STAIRS_WIDTH,
+            STAIRS_HEIGHT,
+            DEFAULT_PERCENT
+        );
+    } else {
+        this.inputGateway = new Image(
+            this.context,
+            'gateway',
+            GATEWAY_WIDTH,
+            GATEWAY_HEIGHT,
+            DEFAULT_PERCENT
+        );
+    }
 }
 
 Tile.prototype.setExitGateway = function() {
-    this.exitGateway = new Image(
-        this.context,
-        'gateway',
-        GATEWAY_WIDTH,
-        GATEWAY_HEIGHT,
-        DEFAULT_PERCENT
-    );
+    if (this.exitStairs) {
+        this.exitGateway = new Image(
+            this.context,
+            'stairs',
+            STAIRS_WIDTH,
+            STAIRS_HEIGHT,
+            DEFAULT_PERCENT
+        );
+    } else {
+        this.exitGateway = new Image(
+            this.context,
+            'gateway',
+            GATEWAY_WIDTH,
+            GATEWAY_HEIGHT,
+            DEFAULT_PERCENT
+        );
+    }
 }
 
 Tile.prototype.createDoor = function(type) {
@@ -560,6 +587,10 @@ Tile.prototype.createPassage = function(link) {
 }
 
 Tile.prototype.render = function(x,y,open,next) {
+    if (open && (this.inputGateway !== undefined) && this.gatewayStairs) {
+        this.inputGateway.render(x+36,y-22);
+    }
+
     if (open) Image.prototype.render.call(this,x,y);
     this.memory.x = x;
     this.memory.y = y;
@@ -598,18 +629,22 @@ Tile.prototype.render = function(x,y,open,next) {
         this.borders.left.render(x,y);
     }
 
-    if (open && (this.inputGateway !== undefined)) {
+    if (open && (this.inputGateway !== undefined) && !this.gatewayStairs) {
         this.inputGateway.render(x+6,y-70);
     }
     if ((open || next) && (this.door !== undefined)) {
         this.door.render(x,y);
     }
     if (open && (this.exitGateway !== undefined)) {
-        this.exitGateway.render(x-29,y-51);
+        if (this.exitStairs) {
+            this.exitGateway.render(x-80,y+2);
+        } else {
+            this.exitGateway.render(x-29,y-51);
+        }
     }
 }
 
-function Room(context,randomSize,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway,isAuxiliary) {
+function Room(context,randomSize,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway,isAuxiliary,currentFloor,lastFloor) {
     let indexesInputGateway = [];
     let indexesExitGateway = [];
     let indexesBottomPassage = [];
@@ -621,6 +656,19 @@ function Room(context,randomSize,inputGateway,exitGateway,containsTopDoor,contai
     randomSize.forEach(function(scaffold,index){
         if (scaffold.acceptGateway) { indexesInputGateway.push(index); }
         if (scaffold.acceptExit) { indexesExitGateway.push(index); }
+
+        scaffold.gatewayStairs = false;
+        scaffold.exitStairs = false;
+        if (lastFloor > 0) {
+            if (currentFloor == 0) {
+                scaffold.exitStairs = true;
+            } else if (currentFloor == lastFloor) {
+                scaffold.gatewayStairs = true;
+            } else {
+                scaffold.gatewayStairs = true;
+                scaffold.exitStairs = true;
+            }
+        }
 
         let tile = new Tile(context,scaffold);
         tiles.push(tile);
@@ -789,7 +837,7 @@ Room.prototype.render = function(x,y) {
 /**********************************************************************************************************/
 /************************************************** MAP ***************************************************/
 /**********************************************************************************************************/
-function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,containsExit) {
+function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,containsExit,currentFloor,lastFloor) {
     this.canvas = canvas;
     this.context = context;
 
@@ -802,10 +850,14 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,co
     this.majorSize = majorSize;
     this.flatAuxiliaryRoom = true;
 
-    this.model = randomBetween(0,3);
+    this.model = (numberOfRooms < 5) ? 0 : randomBetween(0,3);
     this.containsHallway = containsHallway;
     this.containsExit = containsExit;
+    this.exitGatewayCount = 0;
     this.focusedRoom = undefined;
+
+    this.currentFloor = currentFloor;
+    this.lastFloor = lastFloor;
 
     /* Create Main Room */
     this.mainRoom = this.createRoom(false,false,true,false,false,false,false,-1);
@@ -832,6 +884,24 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,co
         this.createBottomRooms(room);
     }
 
+}
+
+Map.prototype.exitGatewayWasDefined = function(exitGateway) {
+    let result = false;
+    if (exitGateway) {
+        if (this.exitGatewayCount == 0) {
+            result = randomBoolean();
+            if (result) {
+                this.exitGatewayCount = -1;
+            } else {
+                this.exitGatewayCount = 1;
+            }
+        } else if (this.exitGatewayCount === 1) {
+            result = true;
+            this.exitGatewayCount = -1;
+        }
+    }
+    return result;
 }
 
 Map.prototype.createLeftRooms = function(room) {
@@ -898,7 +968,9 @@ Map.prototype.createHallway = function(left,requiredHallway) {
         !left, /* Contains Top Door */
         left, /* Contains Left Door */
         true, /* Hallway */
-        false /* Auxiliary Room */
+        false, /* Auxiliary Room */
+        this.currentFloor, /* Current Floor */
+        this.lastFloor /* Last Floor */
     );
     hallway.next = { bottom: undefined, left: undefined };
 
@@ -909,6 +981,8 @@ Map.prototype.createHallway = function(left,requiredHallway) {
 }
 
 Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGateway,exitGateway,isFirst,isSecond,isLast,indexHallway) {
+
+    exitGateway = this.exitGatewayWasDefined(exitGateway);
 
     let random = getRandomRoom( inputGateway ? 'medium' : this.minorSize, this.majorSize );
 
@@ -932,7 +1006,9 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
         containsTopDoor, /* Contains Top Door */
         constainsLeftDoor, /* Contains Left Door */
         false, /* Hallway */
-        false /* Auxiliary Room */
+        false, /* Auxiliary Room */
+        this.currentFloor, /* Current Floor */
+        this.lastFloor /* Last Floor */
     );
 
     let passageBottom = false;
@@ -949,7 +1025,6 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
     let fork = [];
     if (randomBoolean() && (this.focusedRoom === undefined)) {
         fork = forkRange(indexHallway);
-        console.log(indexHallway);
 
         if (fork.length > 0) {
             this.focusedRoom = {
@@ -970,7 +1045,9 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
                 true, /* Contains Top Door */
                 false, /* Contains Left Door */
                 false, /* Hallway */
-                true /* Auxiliary Room */
+                true, /* Auxiliary Room */
+                this.currentFloor, /* Current Floor */
+                this.lastFloor /* Last Floor */
             );
             auxiliaryRoom.passageBottom = false;
             auxiliaryRoom.passageRight = false;
@@ -991,7 +1068,9 @@ Map.prototype.createRoom = function(containsTopDoor,constainsLeftDoor,inputGatew
                 false, /* Contains Top Door */
                 true, /* Contains Left Door */
                 false, /* Hallway */
-                true /* Auxiliary Room */
+                true, /* Auxiliary Room */
+                this.currentFloor, /* Current Floor */
+                this.lastFloor /* Last Floor */
             );
             auxiliaryRoom.passageBottom = false;
             auxiliaryRoom.passageRight = false;
@@ -1164,8 +1243,26 @@ function checkDoorClick(x,y) {
 }
 
 function setDungeonName() {
+
+    let floor = '';
+    if (NUMBER_OF_LAST_FLOOR > 0) {
+        switch (NUMBER_OF_FLOOR) {
+            case 0: floor = ' (ground floor)'; break;
+            case 1: floor = ' (first floor)'; break;
+            case 2: floor = ' (second floor)'; break;
+            case 3: floor = ' (third floor)'; break;
+            case 4: floor = ' (fourth floor)'; break;
+            case 5: floor = ' (fifth floor)'; break;
+            case 6: floor = ' (sixth floor)'; break;
+            case 7: floor = ' (seventh floor)'; break;
+            case 8: floor = ' (eighth floor)'; break;
+            case 9: floor = ' (ninth floor)'; break;
+            case 10: floor = ' (tenth floor)'; break;
+        }
+    }
+
     let h1 = document.getElementById('dungeon-name');
-    h1.textContent = 'Dungeon Name';
+    h1.textContent = 'Dungeon Name' + floor;
 }
 
 function resizeCanvas(dragging_x,dragging_y) {
@@ -1175,7 +1272,7 @@ function resizeCanvas(dragging_x,dragging_y) {
     canvas.height = window.innerHeight - CANVAS_BORDER;
 
     if (map === undefined) {
-        map = new Map(canvas,context,10,'tiny','veryBig',true,true);
+        map = new Map(canvas,context,3,'tiny','veryBig',true,true,NUMBER_OF_FLOOR,NUMBER_OF_LAST_FLOOR);
     }
     map.render(dragging_x,dragging_y);
 }
