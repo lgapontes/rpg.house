@@ -3,6 +3,7 @@
 ## Links
 
 Editor Pixels Online: https://www.piskelapp.com/
+Rotate Images: https://pinetools.com/rotate-image
 
 34:1
 69:21
