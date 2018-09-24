@@ -271,7 +271,11 @@ Tile.prototype.render = function(x,y,open,next) {
     }
 
     if (this.index == '4') {
-        let furniture = new Furniture(this.context,7);
+        let furniture = new Furniture(this.context,1);
+        furniture.render(x,y);
+    }
+    if (this.index == '32') {
+        let furniture = new Furniture(this.context,8);
         furniture.render(x,y);
     }
     if (this.index == '36') {

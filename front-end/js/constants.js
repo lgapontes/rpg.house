@@ -448,6 +448,14 @@ const FURNITURE_TYPES = [
         drawable: { first: true, last: true, gateway: true, onlyWall: false },
         types: [ MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
+    {
+        image: 'furniture_table_2x2',
+        adjustPosition: { x: -18, y: -72 },
+        size: { width: 100, height: 106 },
+        tiles: { width: 2, height: 2 },
+        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        types: [ MAP_TYPES.home, MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
+    },
 ];
 
 /* Conts Auxiliary functions */
