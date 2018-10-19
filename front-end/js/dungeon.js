@@ -1,9 +1,7 @@
 
 /* User Interface */
-let SHOW_INDEXES = DEBUG;
-let SHOW_ALL_ROOMS = DEBUG;
-let NUMBER_OF_FLOOR = 10;
-let NUMBER_OF_LAST_FLOOR = 10;
+var SHOW_INDEXES = DEBUG;
+var SHOW_ALL_ROOMS = DEBUG;
 
 let DOORS = [];
 
@@ -147,7 +145,7 @@ Door.prototype.render = function(x,y) {
 }
 
 function Tile(context,scaffold) {
-    Image.call(this, context,'tile',TILE_WIDTH,TILE_HEIGHT,DEFAULT_PERCENT);
+    Image.call(this, context,MAP_TYPE.tile,TILE_WIDTH,TILE_HEIGHT,DEFAULT_PERCENT);
     this.index = scaffold.index;
     this.origin = scaffold.origin;
     this.memory = { x:0, y:0 };
@@ -270,6 +268,8 @@ Tile.prototype.render = function(x,y,open,next) {
         }
     }
 
+    /*
+    TODO furniture tests
     if (this.index == '4') {
         let furniture = new Furniture(this.context,1);
         furniture.render(x,y);
@@ -282,6 +282,7 @@ Tile.prototype.render = function(x,y,open,next) {
         let furniture = new Furniture(this.context,6);
         furniture.render(x,y);
     }
+    */
 }
 
 function Furniture(context,index) {
@@ -932,7 +933,17 @@ function resizeCanvas(dragging_x,dragging_y) {
     canvas.height = window.innerHeight - CANVAS_BORDER;
 
     if (map === undefined) {
-        map = new Map(canvas,context,10,'veryBig','veryBig',true,true,NUMBER_OF_FLOOR,NUMBER_OF_LAST_FLOOR);
+        map = new Map(
+            canvas,
+            context,
+            mapArchetype.numberOfRooms,
+            mapArchetype.minorSize,
+            mapArchetype.majorSize,
+            mapArchetype.containsHallway,
+            mapArchetype.containsExit,
+            mapArchetype.currentFloor,
+            mapArchetype.lastFloor
+        );
     }
     map.render(dragging_x,dragging_y);
 }

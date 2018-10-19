@@ -48,6 +48,35 @@
 		</div>
 
 		<script type="text/javascript" src="js/constants.js"></script>
+		<script type="text/javascript">
+			/* User Interface */
+
+			/*
+			const MAP_TYPES = {
+			    home: 0,
+			    cave: 1,
+			    dungeon: 2,
+			    tower: 3,
+			    castle: 4
+			}
+			*/
+
+			var NUMBER_OF_FLOOR = 0;
+			var NUMBER_OF_LAST_FLOOR = 0;
+			var MAP_TYPE = MAP_TYPES.home;
+
+			// 'tiny', 'small', 'medium', 'big', 'veryBig'
+
+			var mapArchetype = {
+		        numberOfRooms: 10,
+		        minorSize: 'veryBig',
+		        majorSize: 'veryBig',
+		        containsHallway: true,
+		        containsExit: true,
+		        currentFloor: NUMBER_OF_FLOOR,
+		        lastFloor: NUMBER_OF_LAST_FLOOR
+		    };
+		</script>
 		<script type="text/javascript" src="js/dungeon.js"></script>
 	</body>
 </html>

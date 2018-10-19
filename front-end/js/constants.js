@@ -1,6 +1,5 @@
 
 /* Consts */
-
 const DEBUG = false;
 
 const CANVAS_BORDER = 4;
@@ -31,86 +30,87 @@ const ROOM_SIZE = {
     /*** HALLWAY ***/
     hallway: {
         s1x3: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1), furniture: acceptFurniture(0,0,0) }
         ],
         s1x4: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '4', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1), furniture: acceptFurniture(0,0,0) }
         ],
         s1x5: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '4', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '5', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1), furniture: acceptFurniture(0,0,0) }
         ],
         s1x6: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '4', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '5', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1) },
-            { index: '6', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(0,1,0,1), furniture: acceptFurniture(0,0,0) },
+            { index: '6', origin: { baseIndex: 4, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,1,1), furniture: acceptFurniture(0,0,0) }
         ],
         s3x1: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0), furniture: acceptFurniture(0,0,0) }
         ],
         s4x1: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0), furniture: acceptFurniture(0,0,0) }
         ],
         s5x1: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0), furniture: acceptFurniture(0,0,0) }
         ],
         s6x1: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0) },
-            { index: '6', origin: { baseIndex: 4, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,1,1), furniture: acceptFurniture(0,0,0) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '4', origin: { baseIndex: 2, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '5', origin: { baseIndex: 3, link: LINKS.right }, acceptGateway: false, acceptDoor: false, acceptExit: false, borders: makeBorders(1,0,1,0), furniture: acceptFurniture(0,0,0) },
+            { index: '6', origin: { baseIndex: 4, link: LINKS.right }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,1,0), furniture: acceptFurniture(0,0,0) }
         ]
     },
 
     /*** TINY ***/
     tiny: {
         s2x2: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,0) },
-            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,1) },
-            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1), furniture: acceptFurniture(1,1,1) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,0), furniture: acceptFurniture(1,1,1) },
+            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,1), furniture: acceptFurniture(1,1,1) },
+            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,1,1,0), furniture: acceptFurniture(1,1,1) }
         ]
     },
 
     /*** SMALL ***/
     small: {
         s3x2: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,0) },
-            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,0) },
-            { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,1) },
-            { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,0) },
-            { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1), furniture: acceptFurniture(1,1,1) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,0), furniture: acceptFurniture(1,1,1) },
+            { index: '3', origin: { baseIndex: 1, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,0), furniture: acceptFurniture(1,2,1) },
+            { index: '4', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,1), furniture: acceptFurniture(1,1,1) },
+            { index: '5', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,0), furniture: acceptFurniture(1,1,1) },
+            { index: '6', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,1,1,0), furniture: acceptFurniture(1,1,2) }
         ],
         s2x3: [
-            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1) },
-            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,0) },
-            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,0,0,1) },
-            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,0,0) },
-            { index: '5', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,1) },
-            { index: '6', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,1,1,0) }
+            { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1), furniture: acceptFurniture(1,1,1) },
+            { index: '2', origin: { baseIndex: 0, link: LINKS.right }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,1,0,0), furniture: acceptFurniture(1,1,1) },
+            { index: '3', origin: { baseIndex: 0, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,0,0,1), furniture: acceptFurniture(1,1,2) },
+            { index: '4', origin: { baseIndex: 1, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: false, borders: makeBorders(0,1,0,0), furniture: acceptFurniture(1,1,2) },
+            { index: '5', origin: { baseIndex: 2, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,0,1,1), furniture: acceptFurniture(1,1,2) },
+            { index: '6', origin: { baseIndex: 3, link: LINKS.bottom }, acceptGateway: false, acceptDoor: true, acceptExit: true, borders: makeBorders(0,1,1,0), furniture: acceptFurniture(1,2,1) }
+            // TODO Last acceptFurniture defined.
         ],
         s3x3: [
             { index: '1', origin: { baseIndex: -1, link: LINKS.none }, acceptGateway: true, acceptDoor: true, acceptExit: false, borders: makeBorders(1,0,0,1) },
@@ -376,11 +376,11 @@ const MAP_SIZE = {
 };
 
 const MAP_TYPES = {
-    home: 0,
-    cave: 1,
-    dungeon: 2,
-    tower: 3,
-    castle: 4
+    home: { index: 0, tile: 'tile', stairs: 'stairs' },
+    cave: { index: 1, tile: 'tileCave', stairs: 'stairsCave' },
+    dungeon: { index: 2, tile: 'tileDungeon', stairs: 'stairsDungeon' },
+    tower: { index: 3, tile: 'tile', stairs: 'stairs' },
+    castle: { index: 4, tile: 'tile', stairs: 'stairs' }
 }
 
 const FURNITURE_TYPES = [
@@ -389,7 +389,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: 18, y: -108 },
         size: { width: 105, height: 140 },
         tiles: { width: 1, height: 3 },
-        drawable: { first: false, last: false, gateway: true, onlyWall: true },
+        drawable: { inputGateway: false, lastRoomWithoutGateway: true, lastRoomWithGateway: false, inWall: true, inMiddle: false },
         types: [ MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -397,7 +397,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: -48, y: -104 },
         size: { width: 105, height: 140 },
         tiles: { width: 3, height: 1 },
-        drawable: { first: false, last: false, gateway: true, onlyWall: true },
+        drawable: { inputGateway: false, lastRoomWithoutGateway: true, lastRoomWithGateway: false, inWall: true, inMiddle: false },
         types: [ MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -405,7 +405,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: 7, y: -37 },
         size: { width: 100, height: 72 },
         tiles: { width: 1, height: 2 },
-        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        drawable: { inputGateway: true, lastRoomWithoutGateway: true, lastRoomWithGateway: true, inWall: true, inMiddle: true },
         types: [ MAP_TYPES.home, MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -413,7 +413,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: -40, y: -40 },
         size: { width: 100, height: 72 },
         tiles: { width: 2, height: 1 },
-        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        drawable: { inputGateway: true, lastRoomWithoutGateway: true, lastRoomWithGateway: true, inWall: true, inMiddle: true },
         types: [ MAP_TYPES.home, MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -421,7 +421,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: 7, y: -37 },
         size: { width: 100, height: 72 },
         tiles: { width: 1, height: 2 },
-        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        drawable: { inputGateway: true, lastRoomWithoutGateway: true, lastRoomWithGateway: true, inWall: true, inMiddle: true },
         types: [ MAP_TYPES.home, MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -429,7 +429,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: -40, y: -40 },
         size: { width: 100, height: 72 },
         tiles: { width: 2, height: 1 },
-        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        drawable: { inputGateway: true, lastRoomWithoutGateway: true, lastRoomWithGateway: true, inWall: true, inMiddle: true },
         types: [ MAP_TYPES.home, MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -437,7 +437,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: -4, y: -45 },
         size: { width: 103, height: 81 },
         tiles: { width: 1, height: 2 },
-        drawable: { first: false, last: true, gateway: false, onlyWall: false },
+        drawable: { inputGateway: false, lastRoomWithoutGateway: true, lastRoomWithGateway: false, inWall: true, inMiddle: true },
         types: [ MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -445,7 +445,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: -34, y: -48 },
         size: { width: 103, height: 81 },
         tiles: { width: 2, height: 1 },
-        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        drawable: { inputGateway: false, lastRoomWithoutGateway: true, lastRoomWithGateway: false, inWall: true, inMiddle: true },
         types: [ MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
     {
@@ -453,7 +453,7 @@ const FURNITURE_TYPES = [
         adjustPosition: { x: -18, y: -72 },
         size: { width: 100, height: 106 },
         tiles: { width: 2, height: 2 },
-        drawable: { first: true, last: true, gateway: true, onlyWall: false },
+        drawable: { inputGateway: true, lastRoomWithoutGateway: true, lastRoomWithGateway: true, inWall: false, inMiddle: true },
         types: [ MAP_TYPES.home, MAP_TYPES.cave, MAP_TYPES.dungeon, MAP_TYPES.tower, MAP_TYPES.castle ]
     },
 ];
@@ -462,4 +462,8 @@ const FURNITURE_TYPES = [
 
 function makeBorders(top,right,bottom,left) {
     return { top: top, right: right, bottom: bottom, left: left };
+}
+
+function acceptFurniture(accept, width, height) {
+    return { accept: accept, width: width, height: height };
 }
