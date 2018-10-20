@@ -438,74 +438,92 @@ const MAP_SIZE = {
 
 const MAP_SELECTED = {
     verySmallHouse: {
+        name: 'House',
         size: MAP_SIZE.tiny,
         type: MAP_TYPES.home
     },
     verySmallCave: {
+        name: 'Cave',
         size: MAP_SIZE.tiny,
         type: MAP_TYPES.cave
     },
     verySmallDungeon: {
+        name: 'Dungeon',
         size: MAP_SIZE.tiny,
         type: MAP_TYPES.dungeon
     },
     smallHouse: {
+        name: 'House',
         size: MAP_SIZE.small,
         type: MAP_TYPES.home
     },
     smallCave: {
+        name: 'Cave',
         size: MAP_SIZE.small,
         type: MAP_TYPES.cave
     },
     smallDungeon: {
+        name: 'Dungeon',
         size: MAP_SIZE.small,
         type: MAP_TYPES.dungeon
     },
     house: {
+        name: 'House',
         size: MAP_SIZE.medium,
         type: MAP_TYPES.home
     },
     cave: {
+        name: 'Cave',
         size: MAP_SIZE.medium,
         type: MAP_TYPES.cave
     },
     dungeon: {
+        name: 'Dungeon',
         size: MAP_SIZE.medium,
         type: MAP_TYPES.dungeon
     },
     bigHouse: {
+        name: 'House',
         size: MAP_SIZE.big,
         type: MAP_TYPES.home
     },
     bigCave: {
+        name: 'Cave',
         size: MAP_SIZE.big,
         type: MAP_TYPES.cave
     },
     bigDungeon: {
+        name: 'Dungeon',
         size: MAP_SIZE.big,
         type: MAP_TYPES.dungeon
     },
     castle: {
+        name: 'Castle',
         size: MAP_SIZE.veryBig,
         type: MAP_TYPES.castle
     },
     deepCave: {
+        name: 'Deep Cave',
         size: MAP_SIZE.veryBig,
         type: MAP_TYPES.cave
     },
     deepDungeon: {
+        name: 'Deep Dungeon',
         size: MAP_SIZE.veryBig,
         type: MAP_TYPES.dungeon
     },
     lowTower: {
+        name: 'Tower',
         size: MAP_SIZE.tower,
         type: MAP_TYPES.tower
     },
     tower: {
+        name: 'Tower',
         size: MAP_SIZE.tower,
         type: MAP_TYPES.tower
     },
     highTower: {
+        name: 'Tower',
         size: MAP_SIZE.tower,
         type: MAP_TYPES.tower
     }

@@ -10,19 +10,23 @@ if (mapArchetype == MAP_SELECTED.lowTower) {
     mapArchetype.size.currentFloor = 0;
     mapArchetype.size.lastFloor = 12;
 }
+
+mapArchetype.size.containsExit = CONTAINS_EXIT;
 if (mapArchetype.size.lastFloor > 0) {
     mapArchetype.size.containsExit = true;
 }
 
 /* User Interface */
 var SHOW_INDEXES = DEBUG;
-var SHOW_ALL_ROOMS = DEBUG;
 
 var MAP_TYPE = mapArchetype.type;
 var NUMBER_OF_FLOOR = mapArchetype.size.currentFloor;
 var NUMBER_OF_LAST_FLOOR = mapArchetype.size.lastFloor;
 
 let DOORS = [];
+
+let IN_STAIRS = { click: function(x,y) { return false; } };
+let OUT_STAIRS = { click: function(x,y) { return false; } };
 
 /* Model */
 function Mouse() {
@@ -36,6 +40,7 @@ function Mouse() {
 
 Mouse.prototype.mousedown = function(x,y) {
     checkDoorClick(x,y);
+    checkStairsClick(x,y);
     this.dragging = true;
     this.start_x = x;
     this.start_y = y;
@@ -127,7 +132,7 @@ function Door(context,type,open) {
 Door.prototype.setArea = function(x,y) {
     this.area = {
         a: {x: x, y: y},
-        b: {x: x + DOOR_WIDTH, y: y + DOOR_HEIGHT}
+        b: {x: (x + DOOR_WIDTH) * DEFAULT_PERCENT, y: (y + DOOR_HEIGHT) * DEFAULT_PERCENT}
     };
 }
 
@@ -231,7 +236,22 @@ Tile.prototype.createPassage = function(link) {
 
 Tile.prototype.render = function(x,y,open,next) {
     if (open && (this.inputGateway !== undefined) && this.gatewayStairs) {
-        this.inputGateway.render(x+36,y-22);
+        let calcX = x+36;
+        let calcY = y-22;
+        this.inputGateway.render(calcX,calcY);
+
+        IN_STAIRS = {
+            a: { x: calcX, y: calcY },
+            b: { x: (calcX + STAIRS_WIDTH) * DEFAULT_PERCENT, y: (calcY + STAIRS_HEIGHT) * DEFAULT_PERCENT },
+            click: function(x,y) {
+                if ( (x >= this.a.x) && (x <= this.b.x) ) {
+                    if ( (y >= this.a.y) && (y <= this.b.y) ) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
     }
 
     if (open) Image.prototype.render.call(this,x,y);
@@ -281,7 +301,21 @@ Tile.prototype.render = function(x,y,open,next) {
     }
     if (open && (this.exitGateway !== undefined)) {
         if (this.exitStairs) {
-            this.exitGateway.render(x-80,y+2);
+            let calcX = x-80;
+            let calcY = y+2;
+            this.exitGateway.render(calcX,calcY);
+            OUT_STAIRS = {
+                a: { x: calcX, y: calcY },
+                b: { x: (calcX + STAIRS_WIDTH) * DEFAULT_PERCENT, y: (calcY + STAIRS_HEIGHT) * DEFAULT_PERCENT },
+                click: function(x,y) {
+                    if ( (x >= this.a.x) && (x <= this.b.x) ) {
+                        if ( (y >= this.a.y) && (y <= this.b.y) ) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
         } else {
             this.exitGateway.render(x-29,y-51);
         }
@@ -323,6 +357,8 @@ Furniture.prototype.render = function(x,y) {
 }
 
 function Room(context,randomSize,inputGateway,exitGateway,containsTopDoor,containsLeftDoor,isHallway,isAuxiliary,currentFloor,lastFloor) {
+    this.code = repository.nextRoom();
+
     let indexesInputGateway = [];
     let indexesExitGateway = [];
     let indexesBottomPassage = [];
@@ -519,10 +555,23 @@ Room.prototype.render = function(x,y) {
     });
 }
 
+function Relationships() {
+    this.list = [];
+}
+
+Relationships.prototype.set(parent,child) {
+    this.list[child.code] = parent;
+}
+
+Relationships.prototype.get(sonCode) {
+    return this.list[sonCode];
+}
+
 /**********************************************************************************************************/
 /************************************************** MAP ***************************************************/
 /**********************************************************************************************************/
-function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,containsExit,currentFloor,lastFloor) {
+function Map(uuid,canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,containsExit,currentFloor,lastFloor) {
+    this.uuid = uuid;
     this.canvas = canvas;
     this.context = context;
 
@@ -587,6 +636,11 @@ Map.prototype.exitGatewayWasDefined = function(exitGateway) {
             this.exitGatewayCount = -1;
         }
     }
+
+    if (result && !CONTAINS_EXIT && (this.lastFloor > 0) && (this.lastFloor == this.currentFloor)) {
+        result = false;
+    }
+
     return result;
 }
 
@@ -826,6 +880,7 @@ Map.prototype.render = function(dragging_x,dragging_y) {
 /* Global Instances */
 let map = undefined;
 let mouse = new Mouse();
+let relationships = Relationships();
 
 /* Auxiliary Functions */
 function forkRange(indexHallway) {
@@ -892,8 +947,20 @@ function checkDoorClick(x,y) {
             let diff = mouse.diff();
             resizeCanvas(diff.x,diff.y);
             clicked = true;
+
+            /* Save map */
+            repository.save(map);
         }
         count++;
+    }
+}
+
+function checkStairsClick(x,y) {
+    if (IN_STAIRS.click(x,y)) {
+        console.log('In stairs clicked');
+    }
+    if (OUT_STAIRS.click(x,y)) {
+        console.log('Out stairs clicked');
     }
 }
 
@@ -917,7 +984,7 @@ function setDungeonName() {
     }
 
     let h1 = document.getElementById('dungeon-name');
-    h1.textContent = 'Dungeon Name' + floor;
+    h1.textContent = DUNGEON_NAME + floor;
 }
 
 function resizeCanvas(dragging_x,dragging_y) {
@@ -928,6 +995,7 @@ function resizeCanvas(dragging_x,dragging_y) {
 
     if (map === undefined) {
         map = new Map(
+            UUID,
             canvas,
             context,
             mapArchetype.size.numberOfRooms,
@@ -940,6 +1008,8 @@ function resizeCanvas(dragging_x,dragging_y) {
         );
     }
     map.render(dragging_x,dragging_y);
+
+    repository.save(map);
 }
 
 /* JS Events */

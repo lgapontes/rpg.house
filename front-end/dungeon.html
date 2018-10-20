@@ -51,12 +51,25 @@
 		    </div>
 		</div>
 
+		<script type="text/javascript" src="js/repository.js"></script>
 		<script type="text/javascript" src="js/random.js"></script>
 		<script type="text/javascript" src="js/constants.js"></script>
 		<script type="text/javascript">
-			/* User parameters */
-			var mapArchetype = MAP_SELECTED.dungeon;
-			mapArchetype.size.containsExit = false;
+
+			/* Set uuid */
+			var UUID = guid();
+			/* Set map size */
+			var mapArchetype = MAP_SELECTED.house;
+			/* Set number of floor */
+			mapArchetype.size.currentFloor = 0;
+			mapArchetype.size.lastFloor = 1;
+			/* Set exit */
+			var CONTAINS_EXIT = false;
+			/* Set name of dungeon */
+			var DUNGEON_NAME = mapArchetype.name;
+			/* Show all rooms */
+			var SHOW_ALL_ROOMS = false;
+
 		</script>
 		<script type="text/javascript" src="js/dungeon.js"></script>
 	</body>
