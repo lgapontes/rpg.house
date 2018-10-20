@@ -371,17 +371,145 @@ const DOOR_TYPE = {
     left: { x: -32, y: -74 },
 };
 
-const MAP_SIZE = {
-    // TO-DO
-};
-
 const MAP_TYPES = {
     home: { index: 0, tile: 'tile', stairs: 'stairs' },
-    cave: { index: 1, tile: 'tileCave', stairs: 'stairsCave' },
-    dungeon: { index: 2, tile: 'tileDungeon', stairs: 'stairsDungeon' },
+    cave: { index: 1, tile: 'tile-cave', stairs: 'stairs-cave' },
+    dungeon: { index: 2, tile: 'tile-dungeon', stairs: 'stairs-dungeon' },
     tower: { index: 3, tile: 'tile', stairs: 'stairs' },
     castle: { index: 4, tile: 'tile', stairs: 'stairs' }
 }
+
+const MAP_SIZE = {
+    tiny: {
+        numberOfRooms: 1,
+        minorSize: 'medium',
+        majorSize: 'medium',
+        containsHallway: false,
+        containsExit: false,
+        currentFloor: 0,
+        lastFloor: 0
+    },
+    small: {
+        numberOfRooms: 3,
+        minorSize: 'small',
+        majorSize: 'medium',
+        containsHallway: false,
+        containsExit: false,
+        currentFloor: 0,
+        lastFloor: 0
+    },
+    medium: {
+        numberOfRooms: 5,
+        minorSize: 'small',
+        majorSize: 'big',
+        containsHallway: false,
+        containsExit: false,
+        currentFloor: 0,
+        lastFloor: randomBetween(0, 2)
+    },
+    big: {
+        numberOfRooms: 8,
+        minorSize: 'small',
+        majorSize: 'veryBig',
+        containsHallway: true,
+        containsExit: false,
+        currentFloor: 0,
+        lastFloor: randomBetween(0, 3)
+    },
+    veryBig: {
+        numberOfRooms: 12,
+        minorSize: 'small',
+        majorSize: 'veryBig',
+        containsHallway: true,
+        containsExit: false,
+        currentFloor: 0,
+        lastFloor: randomBetween(0, 4)
+    },
+    tower: {
+        numberOfRooms: 1,
+        minorSize: 'medium',
+        majorSize: 'medium',
+        containsHallway: false,
+        containsExit: false,
+        currentFloor: 0,
+        lastFloor: 0
+    }
+};
+
+const MAP_SELECTED = {
+    verySmallHouse: {
+        size: MAP_SIZE.tiny,
+        type: MAP_TYPES.home
+    },
+    verySmallCave: {
+        size: MAP_SIZE.tiny,
+        type: MAP_TYPES.cave
+    },
+    verySmallDungeon: {
+        size: MAP_SIZE.tiny,
+        type: MAP_TYPES.dungeon
+    },
+    smallHouse: {
+        size: MAP_SIZE.small,
+        type: MAP_TYPES.home
+    },
+    smallCave: {
+        size: MAP_SIZE.small,
+        type: MAP_TYPES.cave
+    },
+    smallDungeon: {
+        size: MAP_SIZE.small,
+        type: MAP_TYPES.dungeon
+    },
+    house: {
+        size: MAP_SIZE.medium,
+        type: MAP_TYPES.home
+    },
+    cave: {
+        size: MAP_SIZE.medium,
+        type: MAP_TYPES.cave
+    },
+    dungeon: {
+        size: MAP_SIZE.medium,
+        type: MAP_TYPES.dungeon
+    },
+    bigHouse: {
+        size: MAP_SIZE.big,
+        type: MAP_TYPES.home
+    },
+    bigCave: {
+        size: MAP_SIZE.big,
+        type: MAP_TYPES.cave
+    },
+    bigDungeon: {
+        size: MAP_SIZE.big,
+        type: MAP_TYPES.dungeon
+    },
+    castle: {
+        size: MAP_SIZE.veryBig,
+        type: MAP_TYPES.castle
+    },
+    deepCave: {
+        size: MAP_SIZE.veryBig,
+        type: MAP_TYPES.cave
+    },
+    deepDungeon: {
+        size: MAP_SIZE.veryBig,
+        type: MAP_TYPES.dungeon
+    },
+    lowTower: {
+        size: MAP_SIZE.tower,
+        type: MAP_TYPES.tower
+    },
+    tower: {
+        size: MAP_SIZE.tower,
+        type: MAP_TYPES.tower
+    },
+    highTower: {
+        size: MAP_SIZE.tower,
+        type: MAP_TYPES.tower
+    }
+};
 
 const FURNITURE_TYPES = [
     {

@@ -1,7 +1,26 @@
+/* Adjust floors */
+
+if (mapArchetype == MAP_SELECTED.lowTower) {
+    mapArchetype.size.currentFloor = 0;
+    mapArchetype.size.lastFloor = 2;
+} else if (mapArchetype == MAP_SELECTED.tower) {
+    mapArchetype.size.currentFloor = 0;
+    mapArchetype.size.lastFloor = 6;
+} else if (mapArchetype == MAP_SELECTED.highTower) {
+    mapArchetype.size.currentFloor = 0;
+    mapArchetype.size.lastFloor = 12;
+}
+if (mapArchetype.size.lastFloor > 0) {
+    mapArchetype.size.containsExit = true;
+}
 
 /* User Interface */
 var SHOW_INDEXES = DEBUG;
 var SHOW_ALL_ROOMS = DEBUG;
+
+var MAP_TYPE = mapArchetype.type;
+var NUMBER_OF_FLOOR = mapArchetype.size.currentFloor;
+var NUMBER_OF_LAST_FLOOR = mapArchetype.size.lastFloor;
 
 let DOORS = [];
 
@@ -164,7 +183,7 @@ Tile.prototype.setInputGateway = function() {
     if (this.gatewayStairs) {
         this.inputGateway = new Image(
             this.context,
-            'stairs',
+            MAP_TYPE.stairs,
             STAIRS_WIDTH,
             STAIRS_HEIGHT,
             DEFAULT_PERCENT
@@ -184,7 +203,7 @@ Tile.prototype.setExitGateway = function() {
     if (this.exitStairs) {
         this.exitGateway = new Image(
             this.context,
-            'stairs',
+            MAP_TYPE.stairs,
             STAIRS_WIDTH,
             STAIRS_HEIGHT,
             DEFAULT_PERCENT
@@ -311,6 +330,13 @@ function Room(context,randomSize,inputGateway,exitGateway,containsTopDoor,contai
     let indexesLeftDoor = [];
     let indexesTopDoor = [];
     let tiles = [];
+
+    let tower = (MAP_TYPE.index == MAP_TYPES.tower.index);
+    if (tower) {
+        if (currentFloor < lastFloor) {
+            exitGateway = true;
+        }
+    }
 
     randomSize.forEach(function(scaffold,index){
         if (scaffold.acceptGateway) { indexesInputGateway.push(index); }
@@ -509,7 +535,8 @@ function Map(canvas,context,numberOfRooms,minorSize,majorSize,containsHallway,co
     this.majorSize = majorSize;
     this.flatAuxiliaryRoom = true;
 
-    this.model = (numberOfRooms < 5) ? 0 : randomBetween(0,3);
+    let house = (MAP_TYPE.index == MAP_TYPES.home.index);
+    this.model = (numberOfRooms < 5 || house) ? 0 : randomBetween(0,3);
     this.containsHallway = containsHallway;
     this.containsExit = containsExit;
     this.exitGatewayCount = 0;
@@ -549,13 +576,13 @@ Map.prototype.exitGatewayWasDefined = function(exitGateway) {
     let result = false;
     if (exitGateway) {
         if (this.exitGatewayCount == 0) {
-            result = randomBoolean();
+            result = (this.model === 0) ? randomBoolean() : true;
             if (result) {
                 this.exitGatewayCount = -1;
             } else {
                 this.exitGatewayCount = 1;
             }
-        } else if (this.exitGatewayCount === 1) {
+        } else if (this.exitGatewayCount == 1) {
             result = true;
             this.exitGatewayCount = -1;
         }
@@ -801,43 +828,6 @@ let map = undefined;
 let mouse = new Mouse();
 
 /* Auxiliary Functions */
-function random(maxExclusive) {
-    return Math.floor(Math.random() * maxExclusive);
-}
-
-function randomBoolean() {
-    let number = Math.floor(Math.random() * 2);
-    return number === 0;
-}
-
-function randomPercent(p) {
-    let number = Math.floor(Math.random() * 100);
-    return number < p;
-}
-
-function randomBetween(minInclusive, maxExclusive) {
-    return Math.floor(Math.random() * (maxExclusive - minInclusive) ) + minInclusive;
-}
-
-function getRandomBottomHallway(requiredHallway) {
-    let indexScaffold = requiredHallway ? 3 : randomBetween(0, 4);
-    return {
-        index: indexScaffold,
-        scaffold: ROOMS[indexScaffold],
-        acceptBottomRoom: -1,
-        acceptLeftRoom: -1
-    };
-}
-function getRandomLeftHallway(requiredHallway) {
-    let indexScaffold = requiredHallway ? 7 : randomBetween(4, 8);
-    return {
-        index: indexScaffold,
-        scaffold: ROOMS[indexScaffold],
-        acceptBottomRoom: -1,
-        acceptLeftRoom: -1
-    };
-}
-
 function forkRange(indexHallway) {
     if ( (indexHallway >= 0) && (indexHallway <= 3) ) {
         return [ 9, 12 ];
@@ -856,6 +846,10 @@ function getRandomRoom(minorInclusive,majorInclusive) {
     if (majorInclusive === 'big') { majorExclusive = sizes['veryBig']; }
     if (majorInclusive === 'veryBig') { majorExclusive = 22; }
     let indexScaffold = randomBetween(sizes[minorInclusive],majorExclusive);
+
+    let tower = (MAP_TYPE.index == MAP_TYPES.tower.index);
+    if (tower) { indexScaffold = 14 }
+
     let random = {
         index: indexScaffold,
         scaffold: ROOMS[indexScaffold],
@@ -936,13 +930,13 @@ function resizeCanvas(dragging_x,dragging_y) {
         map = new Map(
             canvas,
             context,
-            mapArchetype.numberOfRooms,
-            mapArchetype.minorSize,
-            mapArchetype.majorSize,
-            mapArchetype.containsHallway,
-            mapArchetype.containsExit,
-            mapArchetype.currentFloor,
-            mapArchetype.lastFloor
+            mapArchetype.size.numberOfRooms,
+            mapArchetype.size.minorSize,
+            mapArchetype.size.majorSize,
+            mapArchetype.size.containsHallway,
+            mapArchetype.size.containsExit,
+            mapArchetype.size.currentFloor,
+            mapArchetype.size.lastFloor
         );
     }
     map.render(dragging_x,dragging_y);
