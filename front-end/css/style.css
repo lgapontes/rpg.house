@@ -9,9 +9,8 @@ div.header {
     padding: 0;
     line-height: 60px;
     background-color: #602a2c;
-    font-family: sans-serif;
-    font-style: italic;
-    color: #ffffff;
+    color: #cbbda7;
+    font-family: 'Mali', sans-serif;
     font-size: 1.5em;
 
     box-shadow: 0 3px 3px #999999;
@@ -130,7 +129,7 @@ form > button {
     border-radius: 0;
     font-family: sans-serif;
     font-style: italic;
-    color: #ffffff;
+    color: #cbbda7;
     font-size: 1em;
     line-height: 30px;
 }

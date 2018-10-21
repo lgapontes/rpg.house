@@ -49,10 +49,11 @@ function Mouse() {
 
 Mouse.prototype.mousedown = function(x,y) {
     checkDoorClick(x,y);
-    checkStairsClick(x,y);
-    this.dragging = true;
-    this.start_x = x;
-    this.start_y = y;
+    if (!checkStairsClick(x,y)) {
+        this.dragging = true;
+        this.start_x = x;
+        this.start_y = y;        
+    }
 }
 
 Mouse.prototype.mousemove = function(x,y,callback) {
@@ -1102,12 +1103,16 @@ function checkDoorClick(x,y) {
 function checkStairsClick(x,y) {
     if (IN_STAIRS.click(x,y)) {
         console.log('In stairs clicked');
+        window.close();
+        return true;
     }
     if (OUT_STAIRS.click(x,y)) {
         console.log('Out stairs clicked');
         window.open(NEXT_FLOOR_LINK, '_blank');
         window.focus();
+        return true;
     }
+    return false;
 }
 
 function setDungeonName() {
