@@ -1,32 +1,37 @@
 var repository = {
+
     sequenceRoom: 0,
     nextRoom: function() {
         this.sequenceRoom = this.sequenceRoom + 1;
         return this.sequenceRoom;
     },
-    save: function(map) {
+    sequenceTile: 0,
+    nextTile: function() {
+        this.sequenceTile = this.sequenceTile + 1;
+        return this.sequenceTile;
+    },
 
-        let obj = Object.assign({}, map);
-        //removeProp(obj,'parent')
-        /*
-        delete obj.context;
-        delete obj.mainRoom.context;
-        obj.mainRoom.tiles.forEach(function(entry){
-            if (!entry.borders.bottom.nullable) {
-                delete entry.borders.bottom.context;
-            }
+    // TODO
+    save: function(map,relationships) {
+
+        //console.log(map);
+
+        /* Convert to JSON */
+        let json = JSON.stringify({
+            map: map,
+            relationships: relationships
         });
-        */
 
-
-        console.log(map);
-        console.log(obj);
-        console.log(map == obj);
+        //console.log(json);
         //console.log('Map ' + map.uuid + ' saved');
+    },
+
+    // TODO
+    load: function(json) {
+
     }
 }
 
-/* https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript */
 function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -36,16 +41,10 @@ function guid() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
-function removeProp(obj, propToDelete) {
-    for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-            if (typeof obj[property] == "object") {
-                removeProp(obj[property], propToDelete);
-            } else {
-                if (property === propToDelete && obj[property] === true) {
-                    delete obj[property];
-                }
-            }
-        }
+function factory(obj,prototype) {
+    for (let property in prototype) {
+        obj[property] = prototype[property];
     }
+    console.log(obj);
+    return obj;
 }

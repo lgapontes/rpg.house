@@ -13,6 +13,49 @@
 			<img src="img/logo.png" />
 			<span>RPG.House</span>
 		</div>
+
+		<form method="get" action="dungeon.php" target=”_blank”>
+			<img src="img/house.png" alt="House" />
+
+			<section>
+				<label for="map">Map</label>
+				<select id="map" name="map">
+					<option value="verySmallHouse">Very Small House</option>
+					<option value="verySmallCave">Very Small Cave</option>
+					<option value="verySmallDungeon">Very Small Dungeon</option>
+					<option value="smallHouse">Small House</option>
+					<option value="smallCave">Small Cave</option>
+					<option value="smallDungeon">Small Dungeon</option>
+					<option value="house" selected>House</option>
+					<option value="cave">Cave</option>
+					<option value="dungeon">Dungeon</option>
+					<option value="bigHouse">Big House</option>
+					<option value="bigCave">Big Cave</option>
+					<option value="bigDungeon">Big Dungeon</option>
+					<option value="castle">Castle</option>
+					<option value="deepCave">Deep Cave</option>
+					<option value="deepDungeon">Deep Dungeon</option>
+					<option value="lowTower">Low Tower</option>
+					<option value="tower">Tower</option>
+					<option value="highTower">High Tower</option>
+				</select>
+			</section>
+
+			<section>
+				<label for="name">Name</label>
+				<input type="text" id="name" name="name" placeholder="Dungeon name (optional)" />
+			</section>
+			<section class="checkbox">
+				<label class="control control-checkbox">
+	        		It has exit passage
+	            	<input type="checkbox" id="exit" name="exit" />
+	        		<div class="control_indicator"></div>
+	    		</label>
+			</section>
+
+			<button>Create</button>
+		</form>
+
 		<script type="text/javascript" src="js/index.js"></script>
 	</body>
 </html>

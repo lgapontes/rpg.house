@@ -56,19 +56,69 @@
 		<script type="text/javascript" src="js/constants.js"></script>
 		<script type="text/javascript">
 
+			<?php
+				$link = "dungeon.php?";
+
+				$map = "house";
+				if ( isset($_GET["map"]) ) {
+					$map = $_GET["map"];
+				}
+
+				$maps = array("verySmallHouse","verySmallCave","verySmallDungeon","smallHouse","smallCave",
+				"smallDungeon","house","cave","dungeon","bigHouse","bigCave","bigDungeon","castle",
+				"deepCave","deepDungeon","lowTower","tower","highTower");
+				if (!in_array($map, $maps)) {
+				    $map = "house";
+				}
+				$link = $link . "map=" . $map;
+				$map = "'" . $map . "'";
+
+				$floor = 0;
+				if ( isset($_GET["floor"]) ) {
+					$floor = intval($_GET["floor"]);
+				}
+				$link = $link . "&floor=" . ($floor + 1);
+
+				$exit = "false";
+				if ( isset($_GET["exit"]) ) {
+					$exit = $_GET["exit"] === "on" ? "true" : "false";
+				}
+				$link = $link . "&exit=" . $exit;
+
+				$name = "mapArchetype.name";
+				if ( isset($_GET["name"]) && (strlen($_GET["name"]) > 0) ) {
+					$link = $link . "&name=" . $_GET["name"];
+					$name = "'" . $_GET["name"] . "'";
+				}
+
+				$lastFloor = 0;
+				if ( isset($_GET["lastFloor"]) ) {
+					$lastFloor = intval($_GET["lastFloor"]);
+					$link = $link . "&lastFloor=" . $lastFloor;
+				}
+
+				$link = "'" . $link . "'";
+			?>
+
 			/* Set uuid */
 			var UUID = guid();
 			/* Set map size */
-			var mapArchetype = MAP_SELECTED.house;
+			var mapArchetype = MAP_SELECTED[<?=$map?>];
 			/* Set number of floor */
-			mapArchetype.size.currentFloor = 0;
-			mapArchetype.size.lastFloor = 1;
+			mapArchetype.size.currentFloor = <?=$floor?>;
+			<?php
+				if ($lastFloor > 0) {
+					echo "mapArchetype.size.lastFloor = $lastFloor;\n";
+				}
+			?>
 			/* Set exit */
-			var CONTAINS_EXIT = false;
+			var CONTAINS_EXIT = <?=$exit?>;
 			/* Set name of dungeon */
-			var DUNGEON_NAME = mapArchetype.name;
+			var DUNGEON_NAME = <?=$name?>;
 			/* Show all rooms */
 			var SHOW_ALL_ROOMS = false;
+			/* Next link, if exists */
+			var NEXT_FLOOR_LINK = <?=$link?>;
 
 		</script>
 		<script type="text/javascript" src="js/dungeon.js"></script>

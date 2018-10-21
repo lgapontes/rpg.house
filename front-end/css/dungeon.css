@@ -21,7 +21,7 @@ canvas:hover {
 }
 
 h1 {
-    "Comic Sans MS", cursive, sans-serif;
+    font-family: sans-serif;
     font-style: italic;
     font-size: 1.6em;
     padding: 0.4em;
