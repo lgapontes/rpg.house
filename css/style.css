@@ -11,11 +11,15 @@ header {
 	top: 20px;
 	left: 0;
 	height: 60px;
-	width: 100%;	
+	width: 100%;
 	background-image: linear-gradient(to bottom, #202020, #303030);
 	box-shadow: 0 0 2px #aaaaaa;
 	z-index: 1;
 	min-width: 320px;
+}
+
+.miniplot header {
+	background-image: linear-gradient(to bottom right, #6272b4, #2b3e8c);
 }
 
 header::after {
@@ -26,18 +30,29 @@ header::after {
 }
 
 header img.logo {
-	display: block;	
-	height: 60px;	
+	display: block;
+	height: 60px;
 	margin: 0px auto 10px auto;
 	z-index: 2;
 }
 
-header ul.social {	
+.miniplot header img.logo {
+	display: block;
+	height: 70px;
+	z-index: 2;
+	margin: -5px auto 0 auto;
+}
+
+header ul.social {
 	padding: 0;
-	display: block;	
+	display: block;
 	margin: 0 auto;
 	list-style: none;
 	text-align: center;
+}
+
+.miniplot header ul.social {
+	display: none;
 }
 
 header ul.social li {
@@ -63,9 +78,54 @@ main {
 	margin: 150px auto 20px auto;
 	padding: 0;
 	border: 0;
-	font-family: 'Wendy One', sans-serif;	
+	font-family: 'Wendy One', sans-serif;
 	font-size: 1.0em;
 	color: #f44242;
+}
+
+.miniplot main {
+	margin: 100px 0 20px 0;
+	text-align: center;
+}
+
+.miniplot main table {
+	margin: 5px auto 0 auto;
+	padding: 0;
+	border: 0;
+	font-family: serif;
+	font-size: 0.7em;
+	color: #332828;
+	text-align: left;
+}
+
+.miniplot main table tr, .miniplot main table th, .miniplot main table td {
+	margin: 0;
+	padding: 5px;
+	border: 0;
+}
+
+.miniplot main table th {
+	background-color: #332828;
+	color: #ffffff;
+}
+
+.miniplot main table tr:nth-child(odd) {
+	background-color: #f7eaea;
+}
+
+.miniplot th:nth-child(4), .miniplot td:nth-child(4), .miniplot td:last-child {
+	text-align: center;
+}
+
+.miniplot main table td a {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	text-decoration: none;
+}
+
+.miniplot main table td a img {
+	width: 20px;
 }
 
 main::after {
@@ -76,7 +136,7 @@ main::after {
 }
 
 main div.caixa {
-	display: block;	
+	display: block;
 	width: 92%;
 	box-sizing: border-box;
 	margin: 0 auto 20px auto;
@@ -137,7 +197,7 @@ main div.caixa a.manifesto img {
 }
 
 main div.comments {
-	display: block;	
+	display: block;
 	width: 92%;
 	box-sizing: border-box;
 	margin: 0 auto 20px auto;
@@ -152,7 +212,7 @@ main div.comments div.fb-comments {
     position: relative;
     min-height: 50px;
     margin-top: 10px;
-    
+
     background-color: #f4f7ff;
 }
 
@@ -160,7 +220,7 @@ main div.comments div.fb-comments {
     background-image: url(../img/loader.gif);
     background-repeat: no-repeat;
     background-size: 50px;
-    background-position: center; 
+    background-position: center;
 }
 
 #facebook-comments.loader[fb-xfbml-state="rendered"] {
@@ -179,24 +239,34 @@ footer img {
 }
 
 @media only screen and (min-width: 800px) {
-	header {		
-		height: 100px;		
+	header {
+		height: 100px;
 	}
 
 	 header img.logo {
-		display: block;	
-		height: 100px;	
-		margin: 0 0 0 20px;		
+		display: block;
+		height: 100px;
+		margin: 0 0 0 20px;
 		float: left;
 	}
 
-	header ul.social {	
+	.miniplot header img.logo {
+	   height: 140px;
+	   margin: -20px auto 20px auto;
+	   float: none;
+   }
+
+	header ul.social {
 		padding: 0;
-		display: block;	
+		display: block;
 		float: right;
 		margin: 20px 20px 0 0;
 		list-style: none;
 		text-align: center;
+	}
+
+	.miniplot header ul.social {
+		display: none;
 	}
 
 	header ul.social li img {
@@ -207,9 +277,13 @@ footer img {
 		font-size: 2.0em;
 	}
 
+	.miniplot main {
+		margin: 140px 20px 20px 20px;
+	}
+
 	main div.caixa {
 		display: block;
-		float: left;	
+		float: left;
 		width: 48%;
 		box-sizing: border-box;
 		margin: 1% 1%;
@@ -217,7 +291,7 @@ footer img {
 
 	main div.comments {
 		display: block;
-		float: left;	
+		float: left;
 		width: 98%;
 		box-sizing: border-box;
 		margin: 1% 1%;
