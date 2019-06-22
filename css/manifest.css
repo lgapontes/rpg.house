@@ -1,0 +1,120 @@
+* {
+	font-family: 'Bitter', serif;
+	color: #505050;
+}
+
+body {
+	padding: 0;
+	border: 0;
+	margin: 0;
+	background-image: url(../img/background_pattern.jpg);
+}
+
+main {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	border: 0;
+	
+}
+
+h1 {			
+	font-size: 1.2em;
+	margin: 0;
+	background-color: rgba(255, 255, 255, 0.8);
+	padding: 10px;
+	line-height: 40px;
+}
+
+h1::after {
+	content: '';
+	height: 0;
+	display: block;
+	clear: both;
+}
+
+h1 span.full { display: none; }
+h1 span.small { display: inline; }
+
+h1 a {
+	box-sizing: border-box;
+	display: block;
+	float: right;
+	text-decoration: none;
+	margin: 0 3px 0 3px;
+	padding-top: 0;
+}
+
+h1 a img {
+	height: 20px;
+}
+
+p {
+	
+	font-size: 0.8em;
+	margin: 0;	
+	margin: 10px;
+}
+
+ol {			
+	font-size: 0.8em;
+	margin: 0;	
+	margin: 20px 10px;
+	padding-inline-start: 20px;
+}
+
+strong {
+	color: #000000;
+}
+
+li {
+	margin: 0;
+	padding: 0;
+}
+
+main div.comments div.fb-comments {
+	display: block;
+	text-decoration: none;
+	box-sizing: border-box;
+	border: 0;
+	width: 100%;
+	margin-top: 30px;
+    
+        background-color: rgba(255, 255, 255, 0.8);
+}
+
+#facebook-comments.loader {
+    background-image: url(../img/loader.gif);
+    background-repeat: no-repeat;
+    background-size: 50px;
+    background-position: center; 
+}
+
+#facebook-comments.loader[fb-xfbml-state="rendered"] {
+    background-image: none;
+}
+
+@media only screen and (min-width: 800px) {	
+	h1 span.full { display: inline; }
+	h1 span.small { display: none; }
+	h1 a {		
+		margin: 0 5px 0 5px;
+		padding-top: 6px;
+	}
+	h1 a img {
+		height: 34px;
+	}
+	main {
+		width: 70%;
+		font-size: 2.0em;
+		margin: 40px auto;
+	}
+	p {
+		font-size: 0.6em;
+	}
+	ol {
+		font-size: 0.6em;
+	}
+}

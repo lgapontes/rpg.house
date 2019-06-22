@@ -1,0 +1,14 @@
+Options +FollowSymLinks
+RewriteEngine On
+
+Header add Access-Control-Allow-Origin "*"
+Header add Access-Control-Allow-Methods: "GET,POST,OPTIONS,DELETE,PUT"
+Header add Access-Control-Allow-Headers: "Content-Type"
+
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+
+RewriteRule ^/?loot/(.*?)/?$ /api/controller.php?hash=$1 [L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /api/controller\.php\?hash=([^\&\ ]+)
+RewriteRule ^/?api/controller\.php$ /api/controller/%1? [L,R=301]

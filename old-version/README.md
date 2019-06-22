@@ -1,3 +1,0 @@
-# rpg.house
-
-RPG house
