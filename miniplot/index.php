@@ -16,6 +16,7 @@
    </header>
 
    <main>
+       <!-- https://meublogderpg.wordpress.com/2014/07/14/ficha-de-personagem-dd-5e-em-portugues/ -->
        <span>Fichas dos personagens (D&D 5ª edição)</span>
        <table>
            <tr>
@@ -25,13 +26,6 @@
                <!-- Healer, Tank, DPS, Ranged, Conjurador, Stealth -->
                <th>Estereótipo</th>
                <th>Ficha</th>
-           </tr>
-           <tr>
-               <td>Adark</td>
-               <td>Anão da Montanha</td>
-               <td>Bárbaro Lv1</td>
-               <td>DPS</td>
-               <td><a href="fichas/Rolen | Elfo Eladrin | Rogue Lv1 | Stealth.pdf" target="_blank"><img src="../img/icon-download.png" alt="Download" /></a></td>
            </tr>
            <?php
                 $arquivos = array_diff(scandir("fichas"), array('..', '.'));
