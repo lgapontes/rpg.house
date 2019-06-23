@@ -98,6 +98,27 @@ main {
 	text-align: left;
 }
 
+.miniplot main p {
+	display: block;
+	max-width: 560px;
+	margin: 5px auto 40px auto;
+	padding: 0;
+	border: 0;
+	font-family: serif;
+	font-size: 0.7em;
+	color: #332828;
+	text-align: left;
+}
+
+.miniplot main p a {
+	text-decoration: none;
+	color: #6272b4;
+}
+
+.miniplot main p a:hover {
+	text-decoration: underline;
+}
+
 .miniplot main table tr, .miniplot main table th, .miniplot main table td {
 	margin: 0;
 	padding: 5px;
