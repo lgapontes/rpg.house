@@ -100,9 +100,11 @@ main {
 
 .miniplot main p {
 	display: block;
-	max-width: 560px;
+	max-width: 320px;
+	background-color: #f7eaea;
+	padding: 5px;
+	box-sizing: border-box;
 	margin: 5px auto 40px auto;
-	padding: 0;
 	border: 0;
 	font-family: serif;
 	font-size: 0.7em;
@@ -300,6 +302,10 @@ footer img {
 
 	.miniplot main {
 		margin: 140px 20px 20px 20px;
+	}
+
+	.miniplot main p {
+		max-width: 560px;
 	}
 
 	main div.caixa {
