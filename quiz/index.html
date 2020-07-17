@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Rancho&display=swap" rel="stylesheet">
+		<link rel="icon" href="img/favicon.png">
+    <style>
+
+      body {
+        background-color: #00ff00;
+        font-family: 'Rancho', cursive;
+        color: #405060;
+      }
+
+      div.paper {
+        width: 360px;
+        height: 400px;
+        position: fixed;
+        margin: 0 auto;
+        background-image: url(img/paper.png);
+        background-repeat: no-repeat;
+        background-size: 360px 400px;
+        padding-bottom: 50px;
+      }
+
+      span.titulo {
+        font-size: 2.2em;
+        text-align: center;
+        line-height: 50px;
+        min-height: 50px;
+        width: 100%;
+        display: block;
+        margin-top: 40px;
+      }
+
+      div.box {
+        margin: 10px auto 0 auto;
+        width: 200px;
+        font-size: 1.8em;
+      }
+
+      div.box::after {
+        content: '';
+        clear: both;
+        height: 0;
+        display: block;
+      }
+
+      div.box span.numero {
+        background-color: #ddddff;
+        width: 30%;
+        display: block;
+        float: left;
+        text-align: center;
+      }
+
+      div.box span.valor {
+        background-color: #eeeeff;
+        color: #303090;
+        margin-left: 2px;
+        width: 65%;
+        float: left;
+        padding: 0 0 0 5px;
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <div class="paper">
+
+      <span class="titulo">Quiz</span>
+      <div class="box">
+        <span class="numero">#1</span>
+        <span class="valor" id="valor1"></span>
+      </div>
+      <div class="box">
+        <span class="numero">#2</span>
+        <span class="valor" id="valor2"></span>
+      </div>
+      <div class="box">
+        <span class="numero">#3</span>
+        <span class="valor" id="valor3"></span>
+      </div>
+      <div class="box">
+        <span class="numero">#4</span>
+        <span class="valor" id="valor4"></span>
+      </div>
+      <div class="box">
+        <span class="numero">#5</span>
+        <span class="valor" id="valor5"></span>
+      </div>
+      
+    </div>
+
+    <script>
+    
+    	function ajax(callback) {
+          var xhr = new XMLHttpRequest();
+		
+          xhr.onload = function () {
+		
+          if (xhr.status >= 200 && xhr.status < 300) {	
+	      callback(xhr);	     
+	    } else {
+              console.log('Erro ao obter os dados do servidor!');
+            }
+          };
+		
+	
+          xhr.open('GET', 'https://rpg.house/quiz/api.php');
+          xhr.send();
+    	}
+    
+    	
+    	function definirValor(tag, valor) {
+    		document.querySelector(tag).textContent = valor;
+    	}
+    	
+    	function definirTitulo(titulo) {
+    	    	document.querySelector('span.titulo').textContent = titulo;    	
+    	}
+    	
+    	
+    
+    	function clear() {
+	    	definirTitulo('Quiz');
+	    	definirValor('#valor1',0);
+		definirValor('#valor2',0);
+		definirValor('#valor3',0);
+		definirValor('#valor4',0);
+		definirValor('#valor5',0);
+    	}
+
+	function buscar_dados() {
+		ajax(function(xhr){
+			let json = JSON.parse(xhr.responseText);
+			
+			definirTitulo('Quiz ' + json.titulo);
+	    		definirValor('#valor1',json.contador['#1']);
+			definirValor('#valor2',json.contador['#2']);
+			definirValor('#valor3',json.contador['#3']);
+			definirValor('#valor4',json.contador['#4']);
+			definirValor('#valor5',json.contador['#5']);
+		});
+	}
+    
+    	setInterval(buscar_dados,2000);
+    
+    </script>
+
+  </body>
+</html>
