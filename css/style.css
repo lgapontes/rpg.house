@@ -1,7 +1,9 @@
-body {
+html, body {
 	padding: 0;
 	border: 0;
 	margin: 0;
+	max-width: 100%;
+  overflow-x: hidden !important;
 }
 
 header {
@@ -10,16 +12,16 @@ header {
 	position: absolute;
 	top: 20px;
 	left: 0;
-	height: 60px;
 	width: 100%;
-	background-image: linear-gradient(to bottom, #202020, #303030);
+	background-image: linear-gradient(to bottom right, #6272b4, #2b3e8c);
 	box-shadow: 0 0 2px #aaaaaa;
 	z-index: 1;
 	min-width: 320px;
+	height: 60px;
 }
 
 .miniplot header {
-	background-image: linear-gradient(to bottom right, #6272b4, #2b3e8c);
+	height: 50px;
 }
 
 header::after {
@@ -40,7 +42,7 @@ header img.logo {
 	display: block;
 	height: 70px;
 	z-index: 2;
-	margin: -5px auto 0 auto;
+	margin: -10px auto 0 auto;
 }
 
 header ul.social {
@@ -84,8 +86,14 @@ main {
 }
 
 .miniplot main {
-	margin: 100px 0 20px 0;
+	margin: 80px 0 20px 0;
+	padding: 0;
 	text-align: center;
+}
+
+.miniplot main span {
+	display: block;
+	margin: 20px 0 0 0;
 }
 
 .miniplot main table {
@@ -100,7 +108,7 @@ main {
 
 .miniplot main p {
 	display: block;
-	max-width: 320px;
+	max-width: 310px;
 	background-color: #f7eaea;
 	padding: 5px;
 	box-sizing: border-box;
@@ -109,16 +117,40 @@ main {
 	font-family: serif;
 	font-size: 0.7em;
 	color: #332828;
-	text-align: left;
+	text-align: center;
+}
+
+.miniplot main p::after {
+	content: '';
+	height: 0;
+	clear: both;
+	display: block;
 }
 
 .miniplot main p a {
 	text-decoration: none;
-	color: #6272b4;
+	font-weight: bold;
+	color: #ff0000;
+	text-align: center;
+	display: inline-block;
 }
 
 .miniplot main p a:hover {
-	text-decoration: underline;
+	background-color: #ffffff;
+}
+
+.miniplot main p img.jogo {
+	height: 50px;
+	display: block;
+	float: left;
+}
+
+.miniplot main p span.texto {
+	display: block;
+	margin-left: 5px;
+	float: left;
+	text-align: left;
+	font-size: 0.9em;
 }
 
 .miniplot main table tr, .miniplot main table th, .miniplot main table td {
@@ -261,21 +293,25 @@ footer img {
 	width: 100px;
 }
 
-@media only screen and (min-width: 800px) {
+@media only screen and (min-width: 1000px) {
 	header {
-		height: 100px;
+		height: 64px;
 	}
 
 	 header img.logo {
 		display: block;
-		height: 100px;
-		margin: 0 0 0 20px;
+		height: 90px;
+		margin: -12px 0 0 20px;
 		float: left;
 	}
 
+	.miniplot header {
+		height: 55px;
+	}
+
 	.miniplot header img.logo {
-	   height: 140px;
-	   margin: -20px auto 20px auto;
+	   height: 100px;
+	   margin: -22px auto 20px auto;
 	   float: none;
    }
 
@@ -283,7 +319,7 @@ footer img {
 		padding: 0;
 		display: block;
 		float: right;
-		margin: 20px 20px 0 0;
+		margin: 5px 20px 0 0;
 		list-style: none;
 		text-align: center;
 	}
@@ -293,19 +329,33 @@ footer img {
 	}
 
 	header ul.social li img {
-		width: 60px;
+		width: 55px;
 	}
 
 	main {
 		font-size: 2.0em;
+		margin: 100px auto 20px auto;
 	}
 
 	.miniplot main {
-		margin: 140px 20px 20px 20px;
+		margin: 100px 20px 20px 20px;
 	}
 
 	.miniplot main p {
 		max-width: 560px;
+	}
+
+	.miniplot main p img.jogo {
+		height: 100px;
+	}
+
+	.miniplot main p a img {
+		height: 20px;
+		margin-right: 5px;
+		margin-top: 1px;
+		display: block;
+		float: left;
+		padding: 2px;
 	}
 
 	main div.caixa {
